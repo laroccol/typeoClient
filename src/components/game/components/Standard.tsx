@@ -20,7 +20,7 @@ import {
   GameTypeNames,
   TextTypes,
 } from "../../../constants/settings";
-import { RaceData, WPMData } from "../../../constants/race";
+import { CharacterData, WPMData } from "../../../constants/race";
 import { GameSettings } from "../../../contexts/GameSettings";
 import * as RaceAPI from "../../../api/rest/race";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -28,6 +28,7 @@ import { CLIENT_RACE_UPDATE_EVENT } from "../../../api/sockets/race";
 import { useSocketContext } from "../../../contexts/SocketContext";
 import Settings from "./Settings";
 import Results, { ResultsData } from "./Results";
+import { getPassage } from "../../../constants/passages";
 
 const PREFIX = "MuiStandardGame";
 
@@ -102,7 +103,7 @@ export default function StandardGame(props: Props) {
   // WPM Tracking
   const [wpm, setWPM] = useState<number>(0);
   const [characterTrackingData, setCharacterTrackingData] = useState<
-    Array<RaceData>
+    Array<CharacterData>
   >([]);
   const [wpmData, setWPMData] = useState<Array<WPMData>>([]);
   const [resultsData, setResultsData] = useState<ResultsData>({
@@ -175,19 +176,15 @@ export default function StandardGame(props: Props) {
     const textType = props.settings.textType;
     const gameInfo = props.settings.gameInfo;
 
-    try {
-      const newPassage = props.passage || (await RaceAPI.getPassage(textType));
-      const newWords = newPassage.split(" ");
-      console.log(props);
+    const newPassage = props.passage || getPassage(textType);
+    const newWords = newPassage.split(" ");
+    console.log(props);
 
-      if (gameInfo.type === GameTypes.WORDS) {
-        newWords.length = gameInfo.amount || 0;
-      }
-      setTextAreaText(newWords.join(" ").trim());
-      setWords(newWords);
-    } catch (err) {
-      //
+    if (gameInfo.type === GameTypes.WORDS) {
+      newWords.length = gameInfo.amount || 0;
     }
+    setTextAreaText(newWords.join(" ").trim());
+    setWords(newWords);
   }, [props.passage, props.settings]);
 
   const OnStartRace = () => {
@@ -206,7 +203,7 @@ export default function StandardGame(props: Props) {
     const correctCharacters = currentCharIndex - errors;
     const accuracy = (correctCharacters / currentCharIndex) * 100;
     setWPMData((prevWPMData) => {
-      setResultsData({
+      const resultsData = {
         dataPoints: prevWPMData,
         accuracy: accuracy,
         characters: { correct: correctCharacters, incorrect: errors },
@@ -214,7 +211,13 @@ export default function StandardGame(props: Props) {
           name: GameTypeNames[props.settings.gameInfo.type],
           amount: props.settings.gameInfo.amount,
         },
-      });
+      };
+      setResultsData(resultsData);
+      try {
+        RaceAPI.sendRaceData(resultsData, characterTrackingData);
+      } catch (err) {
+        console.error(err);
+      }
       return [];
     });
     Reset();
@@ -424,7 +427,7 @@ export default function StandardGame(props: Props) {
     }
   };
 
-  const addRaceDataPoint = () => {
+  const addCharacterDataPoint = () => {
     if (!isRaceRunning) return;
     setCharacterTrackingData((prev) => {
       return [
@@ -489,7 +492,7 @@ export default function StandardGame(props: Props) {
 
   useEffect(() => {
     updateFollower();
-    addRaceDataPoint();
+    addCharacterDataPoint();
   }, [currentCharIndex]);
 
   return (

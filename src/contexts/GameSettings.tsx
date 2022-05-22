@@ -2,9 +2,9 @@ import React, { useContext, useState } from "react";
 import { GameTypes, TextTypes } from "../constants/settings";
 
 export interface GameSettings {
-  textType: number;
+  textType: TextTypes;
   gameInfo: {
-    type: number;
+    type: GameTypes;
     amount?: number;
   };
   online: boolean;

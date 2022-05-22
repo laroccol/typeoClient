@@ -48,7 +48,7 @@ const MATCH_COUTDOWN = 12000;
 
 export default function FFAGame() {
   const [playerData, setPlayerData] = React.useState<Array<PlayerData>>([]);
-  const [status, setStatus] = React.useState<string>(
+  const [status, setStatus] = React.useState<MatchStatus>(
     MatchStatus.WAITING_FOR_PLAYERS
   );
   const [countdown, setCountdown] = React.useState<number>(0);

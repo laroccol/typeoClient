@@ -73,6 +73,7 @@ interface GridCardProps {
   padding?: string;
   accent?: boolean;
   textalign?: string;
+  color?: string;
   sx?: any;
   children?: any;
   [x: string]: any;
@@ -92,7 +93,7 @@ export const GridCard = (props: GridCardProps) => {
     card: {
       padding: props.padding || theme.spacing(2),
       textAlign: props.textalign || "left",
-      backgroundColor: theme.palette.background.paper,
+      backgroundColor: props.color || theme.palette.background.paper,
       backgroundImage: "none",
       color: theme.palette.text.secondary,
       borderRadius: "3px",

@@ -5,6 +5,7 @@ import Login from "./login";
 import ForgotPassword from "./forgot-password";
 import UpdateProfile from "./update-profile";
 import Inbox from "./inbox";
+import Stats from "./stats";
 
 export default {
   Home,
@@ -14,4 +15,5 @@ export default {
   ForgotPassword,
   UpdateProfile,
   Inbox,
+  Stats,
 };

@@ -1,4 +1,4 @@
-export interface RaceData {
+export interface CharacterData {
   charIndex: number;
   isCorrect: boolean;
   timestamp: number;
