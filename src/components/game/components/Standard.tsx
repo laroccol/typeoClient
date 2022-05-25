@@ -27,7 +27,8 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { CLIENT_RACE_UPDATE_EVENT } from "../../../api/sockets/race";
 import { useSocketContext } from "../../../contexts/SocketContext";
 import Settings from "./Settings";
-import Results, { ResultsData } from "./Results";
+import Results from "./Results";
+import { ResultsData } from "../../../constants/race";
 import { getPassage } from "../../../constants/passages";
 
 const PREFIX = "MuiStandardGame";
@@ -107,6 +108,7 @@ export default function StandardGame(props: Props) {
   >([]);
   const [wpmData, setWPMData] = useState<Array<WPMData>>([]);
   const [resultsData, setResultsData] = useState<ResultsData>({
+    passage: "",
     dataPoints: [],
     accuracy: 0,
     characters: { correct: 0, incorrect: 0 },
@@ -204,6 +206,7 @@ export default function StandardGame(props: Props) {
     const accuracy = (correctCharacters / currentCharIndex) * 100;
     setWPMData((prevWPMData) => {
       const resultsData = {
+        passage: textAreaText,
         dataPoints: prevWPMData,
         accuracy: accuracy,
         characters: { correct: correctCharacters, incorrect: errors },
@@ -214,7 +217,7 @@ export default function StandardGame(props: Props) {
       };
       setResultsData(resultsData);
       try {
-        RaceAPI.sendRaceData(resultsData, characterTrackingData);
+        RaceAPI.sendRaceData(currentUser, resultsData, characterTrackingData);
       } catch (err) {
         console.error(err);
       }

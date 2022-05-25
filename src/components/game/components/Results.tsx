@@ -15,6 +15,8 @@ import { Line } from "react-chartjs-2";
 import { WPMData } from "../../../constants/race";
 import "chartjs-adapter-date-fns";
 import { GridCard } from "../../common";
+import { GraphData } from "../../../constants/graphs";
+import { ResultsData } from "../../../constants/race";
 
 ChartJS.register(
   CategoryScale,
@@ -26,26 +28,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-interface GraphData {
-  labels?: Array<string>;
-  datasets: Array<Dataset>;
-}
-
-interface Dataset {
-  label: string;
-  data: Array<{ x: string; y: number }>;
-  fill: boolean;
-  borderColor: string;
-  tension: number;
-}
-
-export interface ResultsData {
-  dataPoints: Array<WPMData>;
-  accuracy: number;
-  characters: { correct: number; incorrect: number };
-  testType: { name: string; amount?: number };
-}
 
 interface ResultsProps {
   open: boolean;
