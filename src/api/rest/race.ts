@@ -6,7 +6,7 @@ import { ResultsData } from "../../constants/race";
 import { RaceStats } from "../../constants/stats";
 import { generateAuthHeader } from "..";
 import Firebase from "firebase";
-import { MockUser } from "../../contexts/AuthContext";
+import { GuestUser } from "../../contexts/AuthContext";
 
 interface PassageResponse {
   passage: string;
@@ -20,9 +20,9 @@ export const getPassage = async (type: number): Promise<string> => {
 };
 
 export const sendRaceData = async (
-  currentUser: Firebase.User | MockUser,
+  currentUser: Firebase.User | GuestUser,
   resultsData: ResultsData,
-  characterData: Array<CharacterData>
+  characterData: CharacterData[]
 ) => {
   return axios.post(
     API_URL + "/race/statreport",

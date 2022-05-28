@@ -12,11 +12,11 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { WPMData } from "../../../constants/race";
+import { WPMData } from "../../../../constants/race";
 import "chartjs-adapter-date-fns";
-import { GridCard } from "../../common";
-import { GraphData } from "../../../constants/graphs";
-import { ResultsData } from "../../../constants/race";
+import { GridCard } from "../../../common";
+import { GraphData } from "../../../../constants/graphs";
+import { ResultsData } from "../../../../constants/race";
 
 ChartJS.register(
   CategoryScale,

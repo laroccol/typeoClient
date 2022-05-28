@@ -31,6 +31,7 @@ export function SocketProvider({ children }: { children: any }) {
     });
 
     if (!isLoggedIn) {
+      socket.auth = { token: currentUser.uid };
       socket.connect();
       return;
     }

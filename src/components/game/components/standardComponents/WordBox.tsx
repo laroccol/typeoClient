@@ -1,5 +1,5 @@
 import React from "react";
-import Follower from "../feedback/Follower";
+import Follower from "../../feedback/Follower";
 import { styled } from "@mui/system";
 
 interface Props {

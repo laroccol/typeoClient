@@ -1,15 +1,16 @@
 import React, { useContext, useState, useEffect } from "react";
 import FireBase, { auth } from "../firebase";
 import { createUser } from "../api/rest/user";
+import { v4 as uuidv4 } from "uuid";
 
-export interface MockUser {
+export interface GuestUser {
   displayName: string | null;
   email: string;
   uid: string;
 }
 
 interface Auth {
-  currentUser: FireBase.User | MockUser;
+  currentUser: FireBase.User | GuestUser;
   login: (
     email: string,
     password: string
@@ -51,11 +52,11 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = React.useState<
-    FireBase.User | MockUser
+    FireBase.User | GuestUser
   >({
     displayName: null,
     email: "null",
-    uid: "null",
+    uid: uuidv4(),
   });
   const [isLoggedIn, setIsLoggedIn] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(true);

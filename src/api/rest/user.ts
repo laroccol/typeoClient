@@ -1,13 +1,13 @@
 import axios from "axios";
 import API_URL from "../../constants/api";
 import Firebase from "firebase";
-import { MockUser } from "../../contexts/AuthContext";
+import { GuestUser } from "../../contexts/AuthContext";
 import { generateAuthHeader } from "..";
 
 const PREFIX = `${API_URL}/user/`;
 
 export const createUser = async (
-  currentUser: Firebase.User | MockUser,
+  currentUser: Firebase.User | GuestUser,
   username: string
 ) => {
   return await axios.post(
@@ -23,7 +23,7 @@ export const createUser = async (
 };
 
 export const sendFriendRequest = async (
-  currentUser: Firebase.User | MockUser,
+  currentUser: Firebase.User | GuestUser,
   uid: string
 ) => {
   return await axios.post(
@@ -39,7 +39,7 @@ export const sendFriendRequest = async (
 };
 
 export const acceptFriendRequest = async (
-  currentUser: Firebase.User | MockUser,
+  currentUser: Firebase.User | GuestUser,
   uid: string
 ) => {
   return await axios.post(
@@ -55,7 +55,7 @@ export const acceptFriendRequest = async (
 };
 
 export const declineFriendRequest = async (
-  currentUser: Firebase.User | MockUser,
+  currentUser: Firebase.User | GuestUser,
   uid: string
 ) => {
   return await axios.post(
@@ -71,7 +71,7 @@ export const declineFriendRequest = async (
 };
 
 export const getFriendRequests = async (
-  currentUser: Firebase.User | MockUser
+  currentUser: Firebase.User | GuestUser
 ) => {
   const res = await axios.get(PREFIX + "friend_requests", {
     withCredentials: true,
@@ -85,7 +85,7 @@ export interface Friend {
   username: string;
 }
 
-export const getFriends = async (currentUser: Firebase.User | MockUser) => {
+export const getFriends = async (currentUser: Firebase.User | GuestUser) => {
   const res = await axios.get(PREFIX + "friends", {
     withCredentials: true,
     headers: await generateAuthHeader(currentUser),

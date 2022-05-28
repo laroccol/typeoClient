@@ -10,7 +10,7 @@ import {
   Modal,
 } from "@mui/material";
 import StandardGame from "../components/Standard";
-import RacersBox from "../components/RacersBox";
+import RacersBox from "../components/standardComponents/RacersBox";
 import {
   DefaultOnlineGameSettings,
   MatchStatus,
@@ -65,12 +65,7 @@ export default function FFAGame() {
     players: Array<string>,
     matchPassage: string
   ) => {
-    setPassage((prev) => {
-      if (prev === " ") {
-        return matchPassage;
-      }
-      return prev;
-    });
+    if (passage === " ") setPassage(matchPassage);
     setPlayerData(players.map((val) => ({ id: val, percentage: 0, wpm: "0" })));
   };
 
@@ -209,9 +204,13 @@ export default function FFAGame() {
             {status === MatchStatus.WAITING_FOR_PLAYERS ? (
               <CircularProgress />
             ) : (
-              <Typography>{countdown}</Typography>
+              <Typography variant="h1" color="success">
+                {countdown}
+              </Typography>
             )}
-            <Typography sx={{ marginTop: 3 }}>{status}</Typography>
+            {status === MatchStatus.WAITING_FOR_PLAYERS ? (
+              <Typography sx={{ marginTop: 3 }}>{status}</Typography>
+            ) : null}
             <Button
               variant="outlined"
               sx={{ marginTop: 3 }}
@@ -230,6 +229,7 @@ export default function FFAGame() {
             passage={passage}
             settings={DefaultOnlineGameSettings}
             testDisabled={status != MatchStatus.STARTED}
+            playerData={playerData}
           />
         </Grid>
         <Grid item xs={2}></Grid>

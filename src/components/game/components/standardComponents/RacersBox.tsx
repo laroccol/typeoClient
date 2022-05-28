@@ -1,11 +1,11 @@
 import React from "react";
-import { GridCard } from "../../common";
+import { GridCard } from "../../../common";
 import { Grid } from "@mui/material";
 import {
   calculateWPMColor,
   LinearProgressWithLabel,
-} from "../feedback/SpeedProgress";
-import { PlayerData } from "../types/FFAGame";
+} from "../../feedback/SpeedProgress";
+import { PlayerData } from "../../types/FFAGame";
 
 interface RacersBoxProps {
   racerData: Array<PlayerData>;
