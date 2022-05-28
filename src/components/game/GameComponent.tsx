@@ -6,7 +6,7 @@ import {
   PLAYER_JOINED_EVENT,
 } from "../../api/sockets/matchmaking";
 import { Grid, Typography, Card, Button } from "@mui/material";
-import Settings from "./components/Settings";
+import Settings from "./components/standardComponents/Settings";
 import { useGameSettings } from "../../contexts/GameSettings";
 import { io, Socket } from "socket.io-client";
 import API_URL from "../../constants/api";

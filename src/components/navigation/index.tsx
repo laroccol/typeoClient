@@ -136,7 +136,9 @@ export default function MiniDrawer(props: MiniDrawerProps) {
 
   const Friends = () => null;
 
-  const Stats = () => null;
+  const Stats = () => {
+    history.push("/stats");
+  };
 
   const Inbox = () => {
     history.push("/inbox");
@@ -204,7 +206,7 @@ export default function MiniDrawer(props: MiniDrawerProps) {
           ].map((val, index) => (
             <Tooltip title={val.name} key={val.name} placement="right">
               <ListItem
-                disabled={["Friends", "Stats", "Inbox"].includes(val.name)}
+                disabled={["Friends", "Inbox"].includes(val.name)}
                 button
                 onClick={val.click}
               >

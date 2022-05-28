@@ -1,15 +1,15 @@
 import React from "react";
-import { useGameSettings } from "../../../contexts/GameSettings";
+import { useGameSettings } from "../../../../contexts/GameSettings";
 import SortByAlphaIcon from "@mui/icons-material/SortByAlpha";
 import ImportContactsIcon from "@mui/icons-material/ImportContacts";
-import { GridCard } from "../../common";
+import { GridCard } from "../../../common";
 import {
   GameTypes,
   GameTypeNames,
   GameTypeAmounts,
   TextTypeNames,
   DefaultGameSettings,
-} from "../../../constants/settings";
+} from "../../../../constants/settings";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AbcIcon from "@mui/icons-material/Abc";

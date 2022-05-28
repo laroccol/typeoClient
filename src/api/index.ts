@@ -1,8 +1,8 @@
 import Firebase from "firebase";
-import { MockUser } from "../contexts/AuthContext";
+import { GuestUser } from "../contexts/AuthContext";
 
 export const generateAuthHeader = async (
-  currentUser: Firebase.User | MockUser
+  currentUser: Firebase.User | GuestUser
 ) => {
   if (currentUser.email === "null") return null;
   const token = await (currentUser as Firebase.User).getIdToken();

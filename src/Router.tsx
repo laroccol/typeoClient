@@ -12,6 +12,7 @@ const Router = () => {
         <Switch>
           <Route exact path="/" component={Pages.Home} />
           <Route exact path="/online" component={Pages.Online} />
+          <Route exact path="/stats" component={Pages.Stats} />
           <PrivateRoute
             exact
             path="/update-profile"

@@ -1,14 +1,14 @@
-export const SettingTypes = {
-  TEXT_TYPE: 0,
-  GAME_INFO: 1,
-};
+export enum SettingTypes {
+  TEXT_TYPE,
+  GAME_INFO,
+}
 
-export const GameTypes = {
-  NONE: 0,
-  TIMED: 1,
-  WORDS: 2,
-  ERRORS: 3,
-};
+export enum GameTypes {
+  NONE,
+  TIMED,
+  WORDS,
+  ERRORS,
+}
 
 export const GameTypeNames = ["None", "Timed", "Words", "Errors"];
 export const GameTypeAmounts = [
@@ -18,10 +18,10 @@ export const GameTypeAmounts = [
   [1, 2, 3, 4, 5],
 ];
 
-export const TextTypes = {
-  PASSAGE: 0,
-  TOP_WORDS: 1,
-};
+export enum TextTypes {
+  PASSAGE,
+  TOP_WORDS,
+}
 
 export const TextTypeNames = ["Passage", "Top Words"];
 
@@ -37,9 +37,9 @@ export const DefaultOnlineGameSettings = {
   online: true,
 };
 
-export const MatchStatus = {
-  WAITING_FOR_PLAYERS: "Waiting For Players",
-  STARTING: "Starting",
-  STARTED: "Started",
-  FINISHED: "Finished",
-};
+export enum MatchStatus {
+  WAITING_FOR_PLAYERS = "Waiting For Players",
+  STARTING = "Starting",
+  STARTED = "Started",
+  FINISHED = "Finished",
+}
