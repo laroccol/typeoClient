@@ -22,7 +22,7 @@ export default function StatCard({ title, subtitle, stat }: StatCardProps) {
           {title}
         </Typography>
         <Divider />
-        <Typography variant="h4" color="primary" paddingTop={3} bottom={0}>
+        <Typography variant="h4" color="secondary" paddingTop={3} bottom={0}>
           {typeof stat === "number" ? stat.toFixed(1) : stat}
         </Typography>
       </GridCard>

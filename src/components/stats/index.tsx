@@ -83,7 +83,7 @@ export default function MainStats() {
           width: "100%",
         }}
       >
-        <Tabs value={tabIndex} onChange={handleTabChange}>
+        <Tabs value={tabIndex} onChange={handleTabChange} textColor="secondary">
           <Tab label="Stats" />
           <Tab label="Graphs" />
         </Tabs>
@@ -173,14 +173,14 @@ const generateGraphDataFromRaces = (
         label: "WPM",
         data: races.map((race) => race.wpm),
         fill: true,
-        borderColor: theme.palette.info.main,
+        borderColor: theme.palette.primary.main,
         tension: 0.1,
       },
       {
         label: "Accuracy",
         data: races.map((race) => race.accuracy),
         fill: true,
-        borderColor: theme.palette.primary.main,
+        borderColor: theme.palette.secondary.main,
         tension: 0.1,
       },
     ],

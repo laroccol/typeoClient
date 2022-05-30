@@ -8,8 +8,11 @@ import {
   SnackbarCloseReason,
   TextField,
   Avatar,
+  Typography,
+  Tooltip,
 } from "@mui/material";
 import { css } from "@emotion/react";
+import { Placement, TextVariant } from "../constants/common";
 
 type DefaultProps = {
   fontSize?: string;
@@ -106,6 +109,35 @@ export const GridCard = (props: GridCardProps) => {
     <ElevatedCard {...rest} sx={{ ...styles.card, ...sx }}>
       {props.children}
     </ElevatedCard>
+  );
+};
+
+interface HoverableTextProps {
+  text: string;
+  hoverText: string;
+  placement?: Placement;
+  variant?: TextVariant;
+  sx?: any;
+  [x: string]: any;
+}
+export const HoverableText = ({
+  text,
+  hoverText,
+  placement,
+  variant,
+  sx,
+  ...rest
+}: HoverableTextProps) => {
+  return (
+    <Tooltip
+      title={<Typography variant="body1">{hoverText}</Typography>}
+      placement={placement}
+      sx={{ ...sx, cursor: "pointer" }}
+    >
+      <Typography {...rest} variant={variant}>
+        {text}
+      </Typography>
+    </Tooltip>
   );
 };
 

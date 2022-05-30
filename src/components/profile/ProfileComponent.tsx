@@ -120,40 +120,43 @@ export default function ProfileComponent({
               fullWidth
               variant="contained"
               color="primary"
-              sx={{ marginTop: 1, marginBottom: 2 }}
+              sx={{ my: 2 }}
               disabled={loading}
             >
               {name}
             </Button>
           </StyledForm>
-          <Grid container>
+          <Grid container my={2}>
             {forgotPasswordLink ? (
               <Grid item xs>
-                <Link to="/forgot-password">
-                  <MuiLink>{"Forgot password?"}</MuiLink>
+                <Link to="/forgot-password" style={{ textDecoration: "none" }}>
+                  <MuiLink color="secondary" sx={{ textUnderlineOffset: 3 }}>
+                    {"Forgot password?"}
+                  </MuiLink>
                 </Link>
               </Grid>
             ) : null}
             {loginLink ? (
               <Grid item xs>
-                <Link to="/login">
-                  <MuiLink>{"Already have an account? Login"}</MuiLink>
+                <Link to="/login" style={{ textDecoration: "none" }}>
+                  <MuiLink color="secondary" sx={{ textUnderlineOffset: 3 }}>
+                    {"Already have an account? Login"}
+                  </MuiLink>
                 </Link>
               </Grid>
             ) : null}
             {signupLink ? (
               <Grid item>
-                <Link to="/signup">
-                  <MuiLink>{"Don't have an account? Sign Up"}</MuiLink>
+                <Link to="/signup" style={{ textDecoration: "none" }}>
+                  <MuiLink color="secondary" sx={{ textUnderlineOffset: 3 }}>
+                    {"Don't have an account? Sign Up"}
+                  </MuiLink>
                 </Link>
               </Grid>
             ) : null}
           </Grid>
         </StyledDiv>
       </GridCard>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 }

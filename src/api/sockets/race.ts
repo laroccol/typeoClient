@@ -8,11 +8,13 @@ export const RACE_COMPLETE_EVENT = `${PREFIX}race-complete`;
 export interface MatchUpdate {
   id: string;
   percentage: number;
+  wordsTyped: number;
   wpm: number;
 }
 
 export interface RacerFinish {
   id: string;
   place: number;
+  wordsTyped: number;
   wpm: number;
 }

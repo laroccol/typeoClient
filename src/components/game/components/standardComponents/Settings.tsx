@@ -15,6 +15,7 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AbcIcon from "@mui/icons-material/Abc";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
+import Filter1Icon from "@mui/icons-material/Filter1";
 
 const GameTypeIcons = [
   <DoDisturbIcon key="noneIcon" />,
@@ -23,7 +24,11 @@ const GameTypeIcons = [
   "Errors",
 ];
 
-const TextTypeIcons = [<ImportContactsIcon key="contactsIcon" />, "1000"];
+const TextTypeIcons = [
+  <ImportContactsIcon key="contactsIcon" />,
+  "1000",
+  <Filter1Icon key="numbersIcon" />,
+];
 
 export default function Settings() {
   const { gameSettings, setGameSettings } = useGameSettings();
@@ -70,7 +75,7 @@ export default function Settings() {
                 sx={{ margin: 1 }}
                 onClick={() => SetMode(index)}
                 color={
-                  gameSettings.gameInfo.type === index ? "info" : "inherit"
+                  gameSettings.gameInfo.type === index ? "primary" : "inherit"
                 }
               >
                 {GameTypeIcons[index]}
@@ -87,7 +92,9 @@ export default function Settings() {
                   key={`${amount}_${index}`}
                   onClick={() => SetAmount(amount)}
                   color={
-                    gameSettings.gameInfo.amount === amount ? "info" : "inherit"
+                    gameSettings.gameInfo.amount === amount
+                      ? "primary"
+                      : "inherit"
                   }
                 >
                   {amount}
@@ -102,7 +109,7 @@ export default function Settings() {
             <Tooltip title={name} key={name}>
               <Button
                 onClick={() => SetTextType(index)}
-                color={gameSettings.textType === index ? "info" : "inherit"}
+                color={gameSettings.textType === index ? "primary" : "inherit"}
               >
                 {TextTypeIcons[index]}
               </Button>

@@ -141,6 +141,16 @@ export const getPassage = (textType: TextTypes) => {
       newPassage = arr.join(" ");
       break;
     }
+    case TextTypes.NUMBERS: {
+      for (let i = 0; i < 70; i++) {
+        const wordLength = Math.floor(Math.random() * 5 + 1);
+        for (let j = 0; j < wordLength; j++) {
+          newPassage += `${Math.floor(Math.random() * 10)}`;
+        }
+        if (i !== 69) newPassage += " ";
+      }
+      break;
+    }
     default:
       break;
   }

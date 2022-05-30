@@ -1,9 +1,10 @@
 import React from "react";
-import { styled } from "@mui/material/styles";
 import PropTypes from "prop-types";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import { TextVariant } from "../../../constants/common";
+import { Box } from "@mui/material";
 
 const PREFIX = "SpeedProgress";
 
@@ -11,54 +12,38 @@ interface LPWLProps {
   label: number | string;
   value: number;
   fillColor: string;
+  labelTextVariant?: TextVariant;
 }
 
-export function LinearProgressWithLabel(props: LPWLProps) {
-  const classes = {
-    colorPrimary: `${PREFIX}-colorPrimary`,
-    barColorPrimary: `${PREFIX}-barColorPrimary`,
-  };
-
-  const Root = styled(Grid)({
-    [`& .${classes.colorPrimary}`]: {
-      background: "white",
-    },
-    [`& .${classes.barColorPrimary}`]: {
-      background: props.fillColor,
-      borderRight: "1px solid black",
-    },
-  });
-
+export function LinearProgressWithLabel({
+  label,
+  value,
+  fillColor,
+  labelTextVariant,
+}: LPWLProps) {
   return (
-    <Root>
-      <Grid container spacing={3} alignItems="center">
-        <Grid item xs={10}>
-          <LinearProgress
-            variant="determinate"
-            {...props}
-            classes={{
-              colorPrimary: classes.colorPrimary,
-              barColorPrimary: classes.barColorPrimary,
-            }}
-          />
-        </Grid>
-        <Grid item xs={2}>
-          <Typography variant="h5" color="textSecondary">
-            {props.label}
-          </Typography>
-        </Grid>
+    <Grid container spacing={3} alignItems="center">
+      <Grid item xs={10}>
+        <LinearProgress
+          value={value}
+          variant="determinate"
+          color="secondary"
+          sx={{
+            "& .MuiLinearProgress-bar1Determinate": {
+              background: fillColor,
+              borderRight: "1px solid black",
+            },
+          }}
+        />
       </Grid>
-    </Root>
+      <Grid item xs={2}>
+        <Typography variant={labelTextVariant || "h5"} color="textSecondary">
+          {label}
+        </Typography>
+      </Grid>
+    </Grid>
   );
 }
-
-LinearProgressWithLabel.propTypes = {
-  /**
-   * The value of the progress indicator for the determinate and buffer variants.
-   * Value between 0 and 100.
-   */
-  value: PropTypes.number.isRequired,
-};
 
 interface SpeedProgressProps {
   wpm: number;
@@ -69,12 +54,8 @@ export default function SpeedProgress({
   wpm,
   sidePadding,
 }: SpeedProgressProps) {
-  const StyledRoot = styled("div")(() => ({
-    width: "100%",
-    padding: `0px ${sidePadding}`,
-  }));
   return (
-    <StyledRoot>
+    <Box sx={{ width: "100%", padding: `0px ${sidePadding}` }}>
       <Grid container spacing={3}>
         <Grid item xs={2}></Grid>
         <Grid item xs={8}>
@@ -86,7 +67,7 @@ export default function SpeedProgress({
         </Grid>
         <Grid item xs={2}></Grid>
       </Grid>
-    </StyledRoot>
+    </Box>
   );
 }
 

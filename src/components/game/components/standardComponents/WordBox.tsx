@@ -26,6 +26,7 @@ const StyledWord = styled("div")(({ theme }) => ({
 class WordBox extends React.Component<Props> {
   render() {
     const { words, boxRef } = this.props;
+    console.table(words);
     let char_count = 0;
     return (
       <StyledTextArea ref={boxRef}>

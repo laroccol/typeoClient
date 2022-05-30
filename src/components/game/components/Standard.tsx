@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React from "react";
 import { styled } from "@mui/material/styles";
 import { useHistory } from "react-router-dom";
 import Grid from "@mui/material/Grid";
@@ -6,36 +6,22 @@ import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import SpeedProgress from "../feedback/SpeedProgress";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import {
-  StyledTextField,
-  ElevatedCard,
-  GridCard,
-  useInterval,
-} from "../../common";
-import { Box, CircularProgress, Dialog, Typography } from "@mui/material";
+import { GridCard, StyledTextField } from "../../common";
+import { Typography } from "@mui/material";
 import Follower from "../feedback/Follower";
 import WordBox from "./standardComponents/WordBox";
-import {
-  GameTypes,
-  GameTypeNames,
-  TextTypes,
-} from "../../../constants/settings";
-import { CharacterData, WPMData } from "../../../constants/race";
+import { GameTypes } from "../../../constants/settings";
 import { GameSettings } from "../../../contexts/GameSettings";
-import * as RaceAPI from "../../../api/rest/race";
 import { useAuth } from "../../../contexts/AuthContext";
-import { CLIENT_RACE_UPDATE_EVENT } from "../../../api/sockets/race";
-import { useSocketContext } from "../../../contexts/SocketContext";
 import Settings from "./standardComponents/Settings";
-import Results from "./standardComponents/Results";
+import Results from "./results/Results";
 import { ResultsData } from "../../../constants/race";
-import { getPassage } from "../../../constants/passages";
-import { PlayerData } from "../types/FFAGame";
+import { OnlineRaceData } from "../types/FFAGame";
 import useRaceLogic from "../RaceLogic";
 
 const usePrevious = (value: any): any => {
-  const ref = useRef<any>();
-  useEffect(() => {
+  const ref = React.useRef<any>();
+  React.useEffect(() => {
     ref.current = value;
   });
   return ref.current;
@@ -85,18 +71,21 @@ interface StandardGameProps {
   settings: GameSettings;
   passage?: string;
   testDisabled?: boolean;
-  playerData?: Array<PlayerData>;
+  onlineRaceData?: OnlineRaceData;
+  setResultsDataProp?: (data: ResultsData) => void;
 }
 
 export default function StandardGame({
   settings,
   passage,
   testDisabled,
-  playerData,
+  onlineRaceData,
+  setResultsDataProp,
 }: StandardGameProps) {
   const { currentUser } = useAuth();
   const {
     raceInfo,
+    raceStatus,
     raceState,
     statState,
     amount,
@@ -106,6 +95,8 @@ export default function StandardGame({
   } = useRaceLogic({
     settings,
     passage,
+    testDisabled,
+    setResultsDataProp,
   });
 
   const prevRaceState = usePrevious(raceState);
@@ -132,8 +123,8 @@ export default function StandardGame({
     backgroundColor: "rgba(255, 255, 255, 0.15)",
   }));
 
-  const Reset = () => {
-    ResetRace();
+  const Reset = (shouldStartRace: boolean) => {
+    ResetRace(shouldStartRace);
 
     if (inputRef.current) {
       inputRef.current.value = "";
@@ -196,7 +187,7 @@ export default function StandardGame({
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     const initFollowerInterval = setInterval(() => {
       if (wbRef.current && wbRef.current.children[0]) {
         updateFollower();
@@ -223,12 +214,15 @@ export default function StandardGame({
   }, []);
 
   React.useEffect(() => {
-    if (raceState.isRaceFinished) {
+    if (raceStatus.isRaceFinished) {
       if (inputRef.current) inputRef.current.value = "";
+      if (settings.online) {
+        setInputDisabled(true);
+      }
     }
-  }, [raceState.isRaceFinished]);
+  }, [raceStatus.isRaceFinished]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     updateFollower();
 
     const prevCurrentCharIndex = prevRaceState?.currentCharIndex || 0;
@@ -264,21 +258,26 @@ export default function StandardGame({
   }, [raceState.currentCharIndex, raceState.isCorrect]);
 
   React.useEffect(() => {
-    if (!testDisabled) Reset();
+    if (testDisabled === false) Reset(true);
   }, [testDisabled]);
 
   React.useEffect(() => {
     updateFollower();
-  }, [playerData?.length]);
+  }, [onlineRaceData?.playerData?.length, onlineRaceData?.finisherData.length]);
+
+  React.useEffect(() => {
+    Reset(false);
+  }, [settings]);
 
   return (
     <Root>
-      {currentUser.uid}
-      <Results
-        open={raceState.isRaceFinished}
-        setOpen={Reset}
-        data={statState.resultsData}
-      />
+      {!settings.online ? (
+        <Results
+          open={raceStatus.isRaceFinished}
+          setOpen={Reset}
+          data={statState.resultsData}
+        />
+      ) : null}
       <Grid container spacing={3}>
         {!settings.online ? (
           <Grid item xs={10} textAlign="center">
@@ -293,11 +292,11 @@ export default function StandardGame({
               <GridCard accent={true}>
                 <WordBox words={raceInfo.words} boxRef={wbRef} />
                 <Follower ccol={ccol} ccot={ccot} ccw={ccw} />
-                {playerData
-                  ? playerData.map((player) => {
+                {onlineRaceData
+                  ? onlineRaceData.playerData.map((player) => {
                       if (player.id === currentUser.uid) return null;
                       const { col, cot, cw } = calculateFollowerPosition(
-                        player.percentage,
+                        player.wordsTyped,
                         raceInfo.words,
                         wbRef
                       );
@@ -321,7 +320,6 @@ export default function StandardGame({
                   style={{
                     padding: "10px",
                     flexGrow: 1,
-                    backgroundColor: raceState.isCorrect ? "inherit" : "red",
                   }}
                   inputProps={{
                     style: { textAlign: "center" },
@@ -329,7 +327,7 @@ export default function StandardGame({
                   variant="standard"
                   required
                   id="type"
-                  fullwidth
+                  fullWidth
                   placeholder="Type Here ..."
                   name="type"
                   fontSize="15pt"
@@ -350,7 +348,11 @@ export default function StandardGame({
                   inputRef={inputRef}
                 />
                 {!settings.online ? (
-                  <Button onClick={Reset} sx={{ display: "inline-block" }}>
+                  <Button
+                    color="secondary"
+                    onClick={() => Reset(false)}
+                    sx={{ display: "inline-block" }}
+                  >
                     <RestartAltIcon />
                   </Button>
                 ) : null}
@@ -370,7 +372,7 @@ export default function StandardGame({
 }
 
 const calculateFollowerPosition = (
-  percentage: number,
+  wordsTyped: number,
   passageArray: Array<string>,
   wordBoxRef: React.RefObject<HTMLDivElement>
 ): { col: number; cot: number; cw: number } => {
@@ -379,9 +381,9 @@ const calculateFollowerPosition = (
     wordBoxRef.current.children[1] &&
     wordBoxRef.current.offsetLeft
   ) {
-    let wordIndex = Math.ceil(percentage * wordBoxRef.current.children.length);
+    let wordIndex = wordsTyped;
     let charIndex = 0;
-    if (wordIndex === passageArray.length) {
+    if (wordIndex >= passageArray.length) {
       wordIndex = passageArray.length - 1;
       charIndex = passageArray[wordIndex].length - 1;
     }
@@ -390,7 +392,7 @@ const calculateFollowerPosition = (
     const charInfo = wordBoxRef.current.children[wordIndex].children[
       charIndex
     ] as HTMLDivElement;
-
+    if (!charInfo) return { col: 0, cot: 0, cw: 0 };
     return {
       col: wordBoxRef.current.offsetLeft + charInfo.offsetLeft - 1,
       cot: wordBoxRef.current.offsetTop + charInfo.offsetTop + 2.5,

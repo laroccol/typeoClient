@@ -13,9 +13,9 @@ const theme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "#ffffff",
-      light: "#eb1c24",
-      dark: "#eb1c24",
+      main: "#0288d1",
+      light: "#03a94f",
+      dark: "#01579b",
     },
     secondary: {
       main: "#ffffff",
@@ -51,6 +51,40 @@ const theme = createTheme({
     fontFamily: ['"Overpass"', "sans-serif"].join(","),
     body1: {
       letterSpacing: "0.1rem",
+    },
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        body: {
+          "&::-webkit-scrollbar": {
+            width: 7,
+            height: 7,
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            borderRadius: "5px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#dfdfdf",
+            borderRadius: "5px",
+          },
+        },
+        div: {
+          "&::-webkit-scrollbar": {
+            width: 7,
+            height: 7,
+          },
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "rgba(0, 0, 0, 0.4)",
+            borderRadius: "5px",
+          },
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#dfdfdf",
+            borderRadius: "5px",
+          },
+        },
+      },
     },
   },
 });
