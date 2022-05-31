@@ -1,6 +1,5 @@
 import React from "react";
 import axios from "axios";
-import API_URL from "../../constants/api";
 import { CharacterData } from "../../constants/race";
 import { ResultsData } from "../../constants/race";
 import { RaceStats } from "../../constants/stats";
@@ -13,9 +12,7 @@ interface PassageResponse {
 }
 
 export const getPassage = async (type: number): Promise<string> => {
-  const res = await axios.get<PassageResponse>(
-    API_URL + `/race/passage?type=${type}`
-  );
+  const res = await axios.get<PassageResponse>(`/race/passage?type=${type}`);
   return res.data.passage;
 };
 
@@ -25,7 +22,7 @@ export const sendRaceData = async (
   characterData: CharacterData[]
 ) => {
   return axios.post(
-    API_URL + "/race/statreport",
+    "/race/statreport",
     {
       resultsData: resultsData,
       characterData: characterData,

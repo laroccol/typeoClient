@@ -1,7 +1,6 @@
 import React from "react";
 import axios from "axios";
 import { generateAuthHeader } from "..";
-import API_URL from "../../constants/api";
 import Firebase from "firebase";
 import { GuestUser, useAuth } from "../../contexts/AuthContext";
 import { RaceStats, StatsStructure, Timeframes } from "../../constants/stats";
@@ -12,13 +11,10 @@ export const getPlayerStats = async (
   currentUser: Firebase.User | GuestUser,
   timeframe: number
 ): Promise<{ races: Array<RaceSchema> }> => {
-  const res = await axios.get(
-    API_URL + `/stats/getstats?timeframe=${timeframe}`,
-    {
-      withCredentials: true,
-      headers: await generateAuthHeader(currentUser),
-    }
-  );
+  const res = await axios.get(`/stats/getstats?timeframe=${timeframe}`, {
+    withCredentials: true,
+    headers: await generateAuthHeader(currentUser),
+  });
 
   return res.data;
 };
