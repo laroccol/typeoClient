@@ -16,19 +16,6 @@ import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
 import { StyledTextField, SuccessAlert, ErrorAlert, GridCard } from "../common";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" to="https://material-ui.com/">
-        <MuiLink>Your Website</MuiLink>
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
 const StyledDiv = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -64,6 +51,9 @@ interface ProfileComponentProps {
   signupLink?: boolean;
   loginLink?: boolean;
   forgotPasswordLink?: boolean;
+  fillDefaults?: {
+    [x: string]: string;
+  };
   children?: any;
 }
 
@@ -79,6 +69,7 @@ export default function ProfileComponent({
   signupLink,
   loginLink,
   forgotPasswordLink,
+  fillDefaults,
   children,
 }: ProfileComponentProps) {
   return (
@@ -109,6 +100,11 @@ export default function ProfileComponent({
                   label={val.label}
                   type={val.name}
                   name={val.name}
+                  defaultValue={
+                    fillDefaults && fillDefaults[val.name]
+                      ? fillDefaults[val.name]
+                      : ""
+                  }
                   autoComplete={val.autoComplete}
                   autoFocus={i === 0}
                 />
@@ -120,40 +116,60 @@ export default function ProfileComponent({
               fullWidth
               variant="contained"
               color="primary"
-              sx={{ marginTop: 1, marginBottom: 2 }}
+              sx={{ mt: 2 }}
               disabled={loading}
             >
               {name}
             </Button>
           </StyledForm>
-          <Grid container>
+          <Grid
+            container
+            mt={4}
+            display={
+              !forgotPasswordLink && !loginLink && !signupLink
+                ? "none"
+                : "inherit"
+            }
+          >
             {forgotPasswordLink ? (
               <Grid item xs>
-                <Link to="/forgot-password">
-                  <MuiLink>{"Forgot password?"}</MuiLink>
-                </Link>
+                <MuiLink
+                  to="/forgot-password"
+                  component={Link}
+                  color="secondary"
+                  sx={{ textUnderlineOffset: 3 }}
+                >
+                  {"Forgot password?"}
+                </MuiLink>
               </Grid>
             ) : null}
             {loginLink ? (
               <Grid item xs>
-                <Link to="/login">
-                  <MuiLink>{"Already have an account? Login"}</MuiLink>
-                </Link>
+                <MuiLink
+                  to="/login"
+                  component={Link}
+                  color="secondary"
+                  sx={{ textUnderlineOffset: 3 }}
+                >
+                  {"Already have an account? Login"}
+                </MuiLink>
               </Grid>
             ) : null}
             {signupLink ? (
               <Grid item>
-                <Link to="/signup">
-                  <MuiLink>{"Don't have an account? Sign Up"}</MuiLink>
-                </Link>
+                <MuiLink
+                  to="/signup"
+                  component={Link}
+                  color="secondary"
+                  sx={{ textUnderlineOffset: 3 }}
+                >
+                  {"Don't have an account? Sign Up"}
+                </MuiLink>
               </Grid>
             ) : null}
           </Grid>
         </StyledDiv>
       </GridCard>
-      <Box mt={8}>
-        <Copyright />
-      </Box>
     </Container>
   );
 }

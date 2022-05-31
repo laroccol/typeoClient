@@ -2,7 +2,7 @@ import React from "react";
 import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -18,7 +18,6 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import logo from "../../images/logo.png";
 import Badge from "@mui/material/Badge";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
@@ -33,7 +32,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import { useSocketContext } from "../../contexts/SocketContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
-import { Tooltip, Typography } from "@mui/material";
+import { Button, Tooltip, Typography } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -75,7 +74,7 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  backgroundColor: "red",
+  backgroundColor: theme.palette.primary.main,
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -115,23 +114,42 @@ export default function MiniDrawer(props: MiniDrawerProps) {
   const theme = useTheme();
   const { currentUser, isLoggedIn, logout } = useAuth();
   const history = useHistory();
+  const location = useLocation();
   const { socket } = useSocketContext();
   const [open, setOpen] = React.useState(false);
 
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const Login = () => {
+    setAnchorEl(null);
     history.push("/login");
   };
 
   const Logout = () => {
     logout();
+    setAnchorEl(null);
     history.push("/");
+  };
+
+  const UpdateProfile = () => {
+    setAnchorEl(null);
+    history.push("/update-profile");
   };
   const Home = () => {
     history.push("/");
   };
 
   const FindMatch = () => {
-    history.push("/online");
+    if (location.pathname === "/online") history.go(0);
+    else history.push("/online");
   };
 
   const Friends = () => null;
@@ -174,15 +192,60 @@ export default function MiniDrawer(props: MiniDrawerProps) {
             <MenuIcon />
           </IconButton>
           <Box sx={{ flexGrow: 1 }} onClick={() => history.push("/")}>
-            <Link to="/">
+            <Link to="/" style={{ textDecoration: "none" }}>
               <img
-                src={logo}
+                src={"typeoLogo.png"}
                 width="172px"
                 height="50px"
                 style={{ marginTop: "7px" }}
               />
+              <Typography display="inline" color="secondary">
+                BETA
+              </Typography>
             </Link>
           </Box>
+          <Typography mx={1}>
+            {isLoggedIn && currentUser.displayName
+              ? currentUser.displayName!.substring(0, 15)
+              : `Guest_${currentUser.uid.substring(0, 6)}`}
+          </Typography>
+          <IconButton
+            onClick={handleMenu}
+            color="secondary"
+            sx={{ mr: 3, ml: 1 }}
+          >
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            {isLoggedIn ? (
+              <Box>
+                <MenuItem onClick={UpdateProfile} sx={{ minWidth: 50, m: 0.2 }}>
+                  <Typography>UpdateProfile</Typography>
+                </MenuItem>
+                <MenuItem onClick={Logout} sx={{ minWidth: 50, m: 0.2 }}>
+                  <Typography>Logout</Typography>
+                </MenuItem>
+              </Box>
+            ) : (
+              <MenuItem onClick={Login} sx={{ minWidth: 150, m: 0.2 }}>
+                <Typography>Login</Typography>
+              </MenuItem>
+            )}
+          </Menu>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>

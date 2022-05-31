@@ -1,28 +1,46 @@
 import React from "react";
 import { GridCard } from "../../../common";
-import { Grid } from "@mui/material";
+import { Divider, Grid, Typography } from "@mui/material";
 import {
   calculateWPMColor,
   LinearProgressWithLabel,
 } from "../../feedback/SpeedProgress";
-import { PlayerData } from "../../types/FFAGame";
+import { OnlineRaceData } from "../../types/FFAGame";
 
 interface RacersBoxProps {
-  racerData: Array<PlayerData>;
+  racerData: OnlineRaceData;
 }
 
 export default function RacersBox({ racerData }: RacersBoxProps) {
   return (
     <GridCard accent={true}>
-      {racerData.map((racer) => {
+      {racerData.playerData.map((racer, index) => {
         return (
-          <Grid key={racer.id} container spacing={0}>
-            <Grid item xs={2}>
-              {racer.id.substring(0, 8)}
+          <Grid
+            key={racer.id}
+            container
+            spacing={0}
+            padding={2}
+            borderTop={index === 0 ? "1px solid gray" : "none"}
+            borderBottom="1px solid gray"
+          >
+            <Grid item xs={3} position="relative">
+              <Typography
+                sx={{
+                  margin: 0,
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                {racer.displayName.substring(0, 15)}
+              </Typography>
             </Grid>
-            <Grid item xs={10}>
+            <Grid item xs={9}>
               <LinearProgressWithLabel
                 label={racer.wpm}
+                labelTextVariant={"h6"}
                 value={racer.percentage * 100}
                 fillColor={calculateWPMColor(parseInt(racer.wpm))}
               />

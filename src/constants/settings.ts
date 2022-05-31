@@ -21,9 +21,10 @@ export const GameTypeAmounts = [
 export enum TextTypes {
   PASSAGE,
   TOP_WORDS,
+  NUMBERS,
 }
 
-export const TextTypeNames = ["Passage", "Top Words"];
+export const TextTypeNames = ["Passage", "Top Words", "Numbers"];
 
 export const DefaultGameSettings = {
   textType: TextTypes.PASSAGE,

@@ -16,7 +16,6 @@ export default function Home(props: HomeProps) {
   const { currentUser, logout } = useAuth();
   const [test, setTest] = useState<string>("");
   const history = useHistory();
-  console.log(props.location?.state);
 
   return (
     <Grid container spacing={3}>

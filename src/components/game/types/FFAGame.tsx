@@ -37,23 +37,57 @@ import {
 } from "../../../api/sockets/race";
 import { useHistory } from "react-router-dom";
 import { GridCard } from "../../common";
+import { useAuth } from "../../../contexts/AuthContext";
+import OnlineResults from "../components/results/OnlineResults";
+import { ResultsData } from "../../../constants/race";
 
-export interface PlayerData {
+export interface OnlineRaceData {
+  playerData: Array<PlayerData>;
+  finisherData: Array<FinisherData>;
+}
+
+interface PlayerData {
   id: string;
+  displayName: string;
   percentage: number;
+  wordsTyped: number;
   wpm: string;
+}
+
+interface FinisherData {
+  id: string;
+  place: number;
 }
 
 const MATCH_COUTDOWN = 12000;
 
 export default function FFAGame() {
-  const [playerData, setPlayerData] = React.useState<Array<PlayerData>>([]);
+  const { currentUser } = useAuth();
+  const [onlineRaceData, setOnlineRaceData] = React.useState<OnlineRaceData>({
+    playerData: [],
+    finisherData: [],
+  });
   const [status, setStatus] = React.useState<MatchStatus>(
     MatchStatus.WAITING_FOR_PLAYERS
   );
   const [countdown, setCountdown] = React.useState<number>(0);
   const [passage, setPassage] = React.useState<string>(" ");
   const [countdownInterval, setCountdownInterval] = React.useState<number>(0);
+
+  const [resultsData, setResultsData] = React.useState<ResultsData>({
+    passage: "",
+    startTime: 0,
+    dataPoints: [],
+    accuracy: 0,
+    characters: { correct: 0, incorrect: 0, total: 0 },
+    testType: { name: "", amount: 0, textType: "" },
+  });
+
+  const [place, setPlace] = React.useState<number>(0);
+  const [wpm, setWpm] = React.useState<number>(0);
+
+  const [resultsOpen, setResultsOpen] = React.useState<boolean>(false);
+  const [testDisabled, setTestDisabled] = React.useState<boolean>(true);
 
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -62,15 +96,30 @@ export default function FFAGame() {
 
   const PlayerJoined = (
     player: string,
-    players: Array<string>,
+    players: Array<{ uid: string; displayName: string }>,
     matchPassage: string
   ) => {
     if (passage === " ") setPassage(matchPassage);
-    setPlayerData(players.map((val) => ({ id: val, percentage: 0, wpm: "0" })));
+    if (players.length === 1) setStatus(MatchStatus.WAITING_FOR_PLAYERS);
+    setOnlineRaceData({
+      ...onlineRaceData,
+      playerData: players.map(({ uid, displayName }) => ({
+        id: uid,
+        displayName: displayName,
+        percentage: 0,
+        wordsTyped: 0,
+        wpm: "0",
+      })),
+    });
   };
 
   const PlayerLeft = (player: string, players: Array<string>) => {
-    setPlayerData((prev) => prev.filter((val) => val.id !== player));
+    setOnlineRaceData((prevOnlineRaceData) => ({
+      ...onlineRaceData,
+      playerData: prevOnlineRaceData.playerData.filter(
+        (val) => val.id !== player
+      ),
+    }));
   };
 
   const MatchStarting = () => {
@@ -125,34 +174,56 @@ export default function FFAGame() {
       return prev;
     });
     setStatus(MatchStatus.STARTED);
+    setTestDisabled(false);
   };
 
   const ServerRaceUpdate = (update: MatchUpdate) => {
     if (update) {
-      setPlayerData((prev) => {
-        const playerIndex = prev.findIndex((val) => val.id === update.id);
-        const prevCopy = [...prev];
+      setOnlineRaceData((prevOnlineRaceData) => {
+        const playerIndex = prevOnlineRaceData.playerData.findIndex(
+          (val) => val.id === update.id
+        );
+        const prevCopy = [...prevOnlineRaceData.playerData];
         prevCopy[playerIndex] = {
           id: update.id,
+          displayName: prevCopy[playerIndex].displayName,
           percentage: update.percentage,
+          wordsTyped: update.wordsTyped,
           wpm: update.wpm.toFixed(1),
         };
-        return prevCopy;
+        return { ...prevOnlineRaceData, playerData: prevCopy };
       });
     }
   };
 
   const RacerFinished = (racerFinish: RacerFinish) => {
     if (racerFinish) {
-      setPlayerData((prev) => {
-        const playerIndex = prev.findIndex((val) => val.id === racerFinish.id);
-        const prevCopy = [...prev];
+      if (racerFinish.id === currentUser.uid) {
+        setWpm(racerFinish.wpm);
+        setPlace(racerFinish.place);
+        setResultsOpen(true);
+        //setTestDisabled(true);
+      }
+      setOnlineRaceData((prevOnlineRaceData) => {
+        const playerIndex = prevOnlineRaceData.playerData.findIndex(
+          (val) => val.id === racerFinish.id
+        );
+        const prevCopy = [...prevOnlineRaceData.playerData];
+        const prevDisplayName = prevCopy[playerIndex].displayName;
         prevCopy[playerIndex] = {
           id: racerFinish.id,
+          displayName: prevDisplayName,
           percentage: 1,
+          wordsTyped: racerFinish.wordsTyped,
           wpm: `${racerFinish.place} - ${racerFinish.wpm.toFixed(1)}`,
         };
-        return prevCopy;
+        return {
+          playerData: prevCopy,
+          finisherData: [
+            ...prevOnlineRaceData.finisherData,
+            { id: racerFinish.id, place: racerFinish.place },
+          ],
+        };
       });
     }
   };
@@ -189,10 +260,17 @@ export default function FFAGame() {
   }, []);
   return (
     <>
+      <OnlineResults
+        open={resultsOpen}
+        setOpen={setResultsOpen}
+        wpm={wpm}
+        data={resultsData}
+        place={place}
+      />
       <Grid
         container
         spacing={3}
-        sx={{ marginTop: 5, position: "relative" }}
+        sx={{ marginTop: 0, position: "relative" }}
         ref={parentRef}
       >
         <Dialog
@@ -212,7 +290,7 @@ export default function FFAGame() {
               <Typography sx={{ marginTop: 3 }}>{status}</Typography>
             ) : null}
             <Button
-              variant="outlined"
+              variant="contained"
               sx={{ marginTop: 3 }}
               onClick={() => history.push("/")}
             >
@@ -220,17 +298,31 @@ export default function FFAGame() {
             </Button>
           </Box>
         </Dialog>
-        <Grid item xs={2}></Grid>
-        <Grid item xs={8}>
-          <RacersBox racerData={playerData} />
+        <Grid item xs={1}></Grid>
+        <Grid item xs={10}>
+          <RacersBox racerData={onlineRaceData} />
         </Grid>
         <Grid item xs={12}>
           <StandardGame
             passage={passage}
             settings={DefaultOnlineGameSettings}
-            testDisabled={status != MatchStatus.STARTED}
-            playerData={playerData}
+            testDisabled={testDisabled}
+            onlineRaceData={onlineRaceData}
+            setResultsDataProp={setResultsData}
           />
+        </Grid>
+        <Grid item xs={12} textAlign="center">
+          {!resultsOpen && place !== 0 ? (
+            <Button
+              variant="contained"
+              sx={{
+                margin: 2,
+              }}
+              onClick={() => setResultsOpen(true)}
+            >
+              Show Results
+            </Button>
+          ) : null}
         </Grid>
         <Grid item xs={2}></Grid>
       </Grid>

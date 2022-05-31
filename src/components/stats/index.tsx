@@ -11,6 +11,7 @@ import {
   Tab,
   useTheme,
   Theme,
+  Typography,
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 // @ts-expect-error No types for module
@@ -31,6 +32,8 @@ import {
   Legend,
 } from "chart.js";
 import { RaceStats, StatsStructure, Timeframes } from "../../constants/stats";
+import { useAuth } from "../../contexts/AuthContext";
+import { GridCard } from "../common";
 
 ChartJS.register(TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -51,6 +54,7 @@ export default function MainStats() {
     statTimeframe > graphTimeframe ? statTimeframe : graphTimeframe
   );
 
+  const { isLoggedIn, currentUser } = useAuth();
   const theme = useTheme();
 
   const handleStatTimeframeChange = (event: SelectChangeEvent) => {
@@ -73,6 +77,20 @@ export default function MainStats() {
     setStats(getStats(statTimeframe));
   }, [statTimeframe, races]);
 
+  if (!isLoggedIn)
+    return (
+      <>
+        <Box sx={{ textAlign: "center", width: "100%", mt: 20 }}>
+          <Typography variant="h2" color="secondary">
+            You must be logged in to see stats
+          </Typography>
+          <Typography variant="h2" color="warning.main" mt={5}>
+            Guest Stats Coming Soon
+          </Typography>
+        </Box>
+      </>
+    );
+
   return (
     <>
       <Box
@@ -83,7 +101,7 @@ export default function MainStats() {
           width: "100%",
         }}
       >
-        <Tabs value={tabIndex} onChange={handleTabChange}>
+        <Tabs value={tabIndex} onChange={handleTabChange} textColor="secondary">
           <Tab label="Stats" />
           <Tab label="Graphs" />
         </Tabs>
@@ -173,14 +191,14 @@ const generateGraphDataFromRaces = (
         label: "WPM",
         data: races.map((race) => race.wpm),
         fill: true,
-        borderColor: theme.palette.info.main,
+        borderColor: theme.palette.primary.main,
         tension: 0.1,
       },
       {
         label: "Accuracy",
         data: races.map((race) => race.accuracy),
         fill: true,
-        borderColor: theme.palette.primary.main,
+        borderColor: theme.palette.secondary.main,
         tension: 0.1,
       },
     ],
