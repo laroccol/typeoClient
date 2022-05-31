@@ -232,17 +232,17 @@ export default function MiniDrawer(props: MiniDrawerProps) {
             onClose={handleClose}
           >
             {isLoggedIn ? (
-              <>
+              <Box>
                 <MenuItem onClick={UpdateProfile} sx={{ minWidth: 50, m: 0.2 }}>
-                  UpdateProfile
+                  <Typography>UpdateProfile</Typography>
                 </MenuItem>
                 <MenuItem onClick={Logout} sx={{ minWidth: 50, m: 0.2 }}>
-                  Logout
+                  <Typography>Logout</Typography>
                 </MenuItem>
-              </>
+              </Box>
             ) : (
               <MenuItem onClick={Login} sx={{ minWidth: 150, m: 0.2 }}>
-                Login
+                <Typography>Login</Typography>
               </MenuItem>
             )}
           </Menu>
