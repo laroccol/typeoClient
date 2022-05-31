@@ -12,7 +12,7 @@ export default function LoginComponent() {
   const [loading, setLoading] = useState(false);
   const history = useHistory();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const target = e.target as typeof e.target & {
@@ -27,17 +27,14 @@ export default function LoginComponent() {
     setError("");
     setLoading(true);
 
-    login(email, password)
-      .then(() => {
-        history.push("/");
-      })
-      .catch((err) => {
-        setErrorOpen(true);
-        setError(err.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    try {
+      await login(email, password);
+      history.push("/");
+    } catch (err: any) {
+      setErrorOpen(true);
+      setError(err.message);
+      setLoading(false);
+    }
   };
 
   return (

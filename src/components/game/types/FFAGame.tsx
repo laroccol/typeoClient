@@ -48,6 +48,7 @@ export interface OnlineRaceData {
 
 interface PlayerData {
   id: string;
+  displayName: string;
   percentage: number;
   wordsTyped: number;
   wpm: string;
@@ -95,15 +96,16 @@ export default function FFAGame() {
 
   const PlayerJoined = (
     player: string,
-    players: Array<string>,
+    players: Array<{ uid: string; displayName: string }>,
     matchPassage: string
   ) => {
     if (passage === " ") setPassage(matchPassage);
     if (players.length === 1) setStatus(MatchStatus.WAITING_FOR_PLAYERS);
     setOnlineRaceData({
       ...onlineRaceData,
-      playerData: players.map((val) => ({
-        id: val,
+      playerData: players.map(({ uid, displayName }) => ({
+        id: uid,
+        displayName: displayName,
         percentage: 0,
         wordsTyped: 0,
         wpm: "0",
@@ -184,6 +186,7 @@ export default function FFAGame() {
         const prevCopy = [...prevOnlineRaceData.playerData];
         prevCopy[playerIndex] = {
           id: update.id,
+          displayName: prevCopy[playerIndex].displayName,
           percentage: update.percentage,
           wordsTyped: update.wordsTyped,
           wpm: update.wpm.toFixed(1),
@@ -206,8 +209,10 @@ export default function FFAGame() {
           (val) => val.id === racerFinish.id
         );
         const prevCopy = [...prevOnlineRaceData.playerData];
+        const prevDisplayName = prevCopy[playerIndex].displayName;
         prevCopy[playerIndex] = {
           id: racerFinish.id,
+          displayName: prevDisplayName,
           percentage: 1,
           wordsTyped: racerFinish.wordsTyped,
           wpm: `${racerFinish.place} - ${racerFinish.wpm.toFixed(1)}`,
@@ -293,8 +298,8 @@ export default function FFAGame() {
             </Button>
           </Box>
         </Dialog>
-        <Grid item xs={2}></Grid>
-        <Grid item xs={8}>
+        <Grid item xs={1}></Grid>
+        <Grid item xs={10}>
           <RacersBox racerData={onlineRaceData} />
         </Grid>
         <Grid item xs={12}>

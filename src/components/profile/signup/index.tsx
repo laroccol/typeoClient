@@ -1,35 +1,10 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
-import MuiLink from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
-import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Collapse from "@mui/material/Collapse";
-import { StyledTextField, ErrorAlert } from "../../common";
-import Container from "@mui/material/Container";
 import { useAuth } from "../../../contexts/AuthContext";
 import { styled } from "@mui/system";
 import ProfileComponent from "../ProfileComponent";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" to="https://material-ui.com/">
-        <MuiLink>Your Website</MuiLink>
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
 
 const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
@@ -72,12 +47,12 @@ export default function SignupComponent(props: any) {
     const password = target.password.value;
     const passwordConfirm = target.password.value;
 
-    // const regex = /^[a-zA-Z0-9_.-]*$/;
-    // if (!regex.test(username)) {
-    //   setErrorOpen(true);
-    //   setError("Invalid Username");
-    //   return;
-    // }
+    const regex = /^[a-zA-Z0-9_.-]*$/;
+    if (!regex.test(username) || !username || username.length > 15) {
+      setErrorOpen(true);
+      setError("Invalid Username");
+      return;
+    }
 
     if (password !== passwordConfirm) {
       setErrorOpen(true);

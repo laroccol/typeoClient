@@ -11,6 +11,7 @@ import {
   Tab,
   useTheme,
   Theme,
+  Typography,
 } from "@mui/material";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 // @ts-expect-error No types for module
@@ -31,6 +32,8 @@ import {
   Legend,
 } from "chart.js";
 import { RaceStats, StatsStructure, Timeframes } from "../../constants/stats";
+import { useAuth } from "../../contexts/AuthContext";
+import { GridCard } from "../common";
 
 ChartJS.register(TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -51,6 +54,7 @@ export default function MainStats() {
     statTimeframe > graphTimeframe ? statTimeframe : graphTimeframe
   );
 
+  const { isLoggedIn, currentUser } = useAuth();
   const theme = useTheme();
 
   const handleStatTimeframeChange = (event: SelectChangeEvent) => {
@@ -72,6 +76,20 @@ export default function MainStats() {
   React.useEffect(() => {
     setStats(getStats(statTimeframe));
   }, [statTimeframe, races]);
+
+  if (!isLoggedIn)
+    return (
+      <>
+        <Box sx={{ textAlign: "center", width: "100%", mt: 20 }}>
+          <Typography variant="h2" color="secondary">
+            You must be logged in to see stats
+          </Typography>
+          <Typography variant="h2" color="warning.main" mt={5}>
+            Guest Stats Coming Soon
+          </Typography>
+        </Box>
+      </>
+    );
 
   return (
     <>

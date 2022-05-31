@@ -32,7 +32,7 @@ import LoginIcon from "@mui/icons-material/Login";
 import { useSocketContext } from "../../contexts/SocketContext";
 import { useAuth } from "../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
-import { Tooltip, Typography } from "@mui/material";
+import { Button, Tooltip, Typography } from "@mui/material";
 
 const drawerWidth = 240;
 
@@ -118,13 +118,30 @@ export default function MiniDrawer(props: MiniDrawerProps) {
   const { socket } = useSocketContext();
   const [open, setOpen] = React.useState(false);
 
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const Login = () => {
+    setAnchorEl(null);
     history.push("/login");
   };
 
   const Logout = () => {
     logout();
+    setAnchorEl(null);
     history.push("/");
+  };
+
+  const UpdateProfile = () => {
+    setAnchorEl(null);
+    history.push("/update-profile");
   };
   const Home = () => {
     history.push("/");
@@ -187,6 +204,48 @@ export default function MiniDrawer(props: MiniDrawerProps) {
               </Typography>
             </Link>
           </Box>
+          <Typography mx={1}>
+            {isLoggedIn && currentUser.displayName
+              ? currentUser.displayName!.substring(0, 15)
+              : `Guest_${currentUser.uid.substring(0, 6)}`}
+          </Typography>
+          <IconButton
+            onClick={handleMenu}
+            color="secondary"
+            sx={{ mr: 3, ml: 1 }}
+          >
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            {isLoggedIn ? (
+              <>
+                <MenuItem onClick={UpdateProfile} sx={{ minWidth: 50, m: 0.2 }}>
+                  UpdateProfile
+                </MenuItem>
+                <MenuItem onClick={Logout} sx={{ minWidth: 50, m: 0.2 }}>
+                  Logout
+                </MenuItem>
+              </>
+            ) : (
+              <MenuItem onClick={Login} sx={{ minWidth: 150, m: 0.2 }}>
+                Login
+              </MenuItem>
+            )}
+          </Menu>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>

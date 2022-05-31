@@ -30,6 +30,8 @@ export function SocketProvider({ children }: { children: any }) {
       console.error(err);
     });
 
+    socket.disconnect();
+
     if (!isLoggedIn) {
       socket.auth = { token: currentUser.uid };
       socket.connect();
@@ -52,7 +54,7 @@ export function SocketProvider({ children }: { children: any }) {
     return () => {
       socket.removeAllListeners();
     };
-  }, [currentUser]);
+  }, [isLoggedIn]);
 
   return (
     <SocketContext.Provider value={value}>{children}</SocketContext.Provider>

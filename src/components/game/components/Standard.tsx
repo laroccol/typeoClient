@@ -387,6 +387,7 @@ const calculateFollowerPosition = (
       wordIndex = passageArray.length - 1;
       charIndex = passageArray[wordIndex].length - 1;
     }
+    console.log(wordIndex, passageArray, wordBoxRef.current.children);
     if (!wordBoxRef.current.children[wordIndex])
       return { col: 0, cot: 0, cw: 0 };
     const charInfo = wordBoxRef.current.children[wordIndex].children[
