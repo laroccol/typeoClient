@@ -34,6 +34,7 @@ import {
 import { RaceStats, StatsStructure, Timeframes } from "../../constants/stats";
 import { useAuth } from "../../contexts/AuthContext";
 import { GridCard } from "../common";
+import StatKeyboard from "./components/StatKeyboard";
 
 ChartJS.register(TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -172,31 +173,38 @@ export default function MainStats() {
           </Grid>
         </Grid>
       </SwipeableViews>
+      {/* <StatKeyboard data={sampleData} /> */}
     </>
   );
 }
+
+const sampleData = [
+  100, 120, 100, 95, 113, 103, 92, 105, 95, 90, 102, 115, 100, 97, 110, 104, 87,
+  123, 130, 124, 113, 98, 117, 95, 100, 97,
+];
 
 const generateGraphDataFromRaces = (
   races: Array<RaceSchema>,
   timeframe: number,
   theme: Theme
 ) => {
+  const filteredRaces = races.filter((race) => race.wpm > 3);
   const graphData = {
-    labels: races
+    labels: filteredRaces
       .slice(-timeframe)
       .map((race) => new Date(race.timestamp).getTime()),
 
     datasets: [
       {
         label: "WPM",
-        data: races.map((race) => race.wpm),
+        data: filteredRaces.map((race) => race.wpm),
         fill: true,
         borderColor: theme.palette.primary.main,
         tension: 0.1,
       },
       {
         label: "Accuracy",
-        data: races.map((race) => race.accuracy),
+        data: filteredRaces.map((race) => race.accuracy),
         fill: true,
         borderColor: theme.palette.secondary.main,
         tension: 0.1,

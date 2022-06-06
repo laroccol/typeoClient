@@ -29,8 +29,6 @@ export function SocketProvider({ children }: { children: any }) {
       console.error(err);
     });
 
-    socket.disconnect();
-
     if (!isLoggedIn) {
       socket.auth = { token: currentUser.uid };
       socket.connect();

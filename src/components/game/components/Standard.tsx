@@ -132,6 +132,7 @@ export default function StandardGame({
     }
 
     if (wbRef.current) {
+      wbRef.current.style.top = "0";
       for (const child of wbRef.current.children) {
         for (const c of child.children) {
           c.className = classes.letter;
@@ -151,6 +152,7 @@ export default function StandardGame({
     wordIndex: number,
     index: number
   ) => {
+    console.log(charStyle);
     if (!(wbRef.current && wbRef.current.children[wordIndex])) return;
     const charDiv = wbRef.current.children[wordIndex].children[index];
     if (!charDiv) return;
@@ -159,13 +161,13 @@ export default function StandardGame({
         charDiv.className = classes.letter;
         break;
       case CharStyle.CORRECT:
-        charDiv.classList.add(classes.correct);
+        charDiv.className = classes.correct;
         break;
       case CharStyle.INCORRECT:
         if (charDiv.innerHTML === "&nbsp;") {
-          charDiv.classList.add(classes.incorrect_space);
+          charDiv.className = classes.incorrect_space;
         } else {
-          charDiv.classList.add(classes.incorrect);
+          charDiv.className = classes.incorrect;
         }
         break;
     }
@@ -181,6 +183,8 @@ export default function StandardGame({
         raceState.currentCharIndex - raceState.currentWordIndex
       ] as HTMLDivElement;
       if (!charInfo) return;
+      if (charInfo.offsetTop > 140)
+        wbRef.current.style.top = `-${charInfo.offsetTop - 133.3}px`;
       setCCOL(wbRef.current.offsetLeft + charInfo?.offsetLeft - 1);
       setCCOT(wbRef.current.offsetTop + charInfo?.offsetTop + 2.5);
       setCCW(charInfo?.offsetWidth + 3);
@@ -252,6 +256,27 @@ export default function StandardGame({
           letterIndex = 0;
         } else {
           letterIndex++;
+        }
+      }
+      if (raceState.prevKey.length === 1) {
+        console.log(raceState.isCorrect);
+        console.log(
+          raceState.wordsTyped,
+          raceState.currentCharIndex - raceState.currentWordIndex - 1
+        );
+        if (!raceState.isCorrect) {
+          setCharStyle(
+            CharStyle.INCORRECT,
+            raceState.wordsTyped,
+            raceState.currentCharIndex - raceState.currentWordIndex - 1
+          );
+        } else {
+          console.log("HERE");
+          setCharStyle(
+            CharStyle.CORRECT,
+            raceState.wordsTyped,
+            raceState.currentCharIndex - raceState.currentWordIndex - 1
+          );
         }
       }
     }
@@ -363,6 +388,14 @@ export default function StandardGame({
 
         {!settings.online ? (
           <Grid item xs={2}>
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ mb: 3, p: 3 }}
+              onClick={() => history.push("/online")}
+            >
+              <Typography>Find Online Match</Typography>
+            </Button>
             <Settings />
           </Grid>
         ) : null}
@@ -387,7 +420,6 @@ const calculateFollowerPosition = (
       wordIndex = passageArray.length - 1;
       charIndex = passageArray[wordIndex].length - 1;
     }
-    console.log(wordIndex, passageArray, wordBoxRef.current.children);
     if (!wordBoxRef.current.children[wordIndex])
       return { col: 0, cot: 0, cw: 0 };
     const charInfo = wordBoxRef.current.children[wordIndex].children[

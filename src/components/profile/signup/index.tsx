@@ -45,7 +45,7 @@ export default function SignupComponent(props: any) {
     const email = target.email.value;
     const username = target.username.value;
     const password = target.password.value;
-    const passwordConfirm = target.password.value;
+    const passwordConfirm = target.passwordConfirm.value;
 
     const regex = /^[a-zA-Z0-9_.-]*$/;
     if (!regex.test(username) || !username || username.length > 15) {
@@ -67,6 +67,7 @@ export default function SignupComponent(props: any) {
     try {
       await signup(email, username, password);
       history.push("/");
+      history.go(0);
     } catch (err: any) {
       setErrorOpen(true);
       setError(`${err.response?.data || err}`);
@@ -82,17 +83,24 @@ export default function SignupComponent(props: any) {
       error={error}
       loading={loading}
       fields={[
-        { name: "email", label: "Email Address", autoComplete: "email" },
-        { name: "username", label: "Username", autoComplete: "username" },
+        { name: "username", type: "text", label: "Username", autoComplete: "" },
+        {
+          name: "email",
+          type: "email",
+          label: "Email Address",
+          autoComplete: "",
+        },
         {
           name: "password",
+          type: "password",
           label: "Password",
-          autoComplete: "current-password",
+          autoComplete: "new-password",
         },
         {
           name: "passwordConfirm",
+          type: "password",
           label: "Confirm Password",
-          autoComplete: "",
+          autoComplete: "new-password",
         },
       ]}
       loginLink

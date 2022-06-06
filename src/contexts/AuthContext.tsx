@@ -121,7 +121,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   React.useEffect(() => {
     setIsLoggedIn(instanceOfFireBaseUser(currentUser));
-    console.log("ASDFJKLASDFKJ");
   }, [currentUser]);
 
   const value: Auth = {

@@ -17,7 +17,7 @@ interface ContextGameSettings {
 
 const GameSettingsContext = React.createContext<ContextGameSettings>({
   gameSettings: {
-    textType: TextTypes.PASSAGE,
+    textType: TextTypes.TOP_WORDS,
     gameInfo: { type: GameTypes.NONE },
     online: false,
   },
@@ -36,7 +36,7 @@ interface ProviderProps {
 
 export function GameSettingsProvider({ children }: ProviderProps) {
   const [gameSettings, setGameSettings] = useState<GameSettings>({
-    textType: TextTypes.PASSAGE,
+    textType: TextTypes.TOP_WORDS,
     gameInfo: { type: GameTypes.NONE },
     online: false,
   });

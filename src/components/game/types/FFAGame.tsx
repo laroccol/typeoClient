@@ -81,6 +81,7 @@ export default function FFAGame() {
     accuracy: 0,
     characters: { correct: 0, incorrect: 0, total: 0 },
     testType: { name: "", amount: 0, textType: "" },
+    characterDataPoints: [],
   });
 
   const [place, setPlace] = React.useState<number>(0);
@@ -101,6 +102,7 @@ export default function FFAGame() {
   ) => {
     if (passage === " ") setPassage(matchPassage);
     if (players.length === 1) setStatus(MatchStatus.WAITING_FOR_PLAYERS);
+    console.log(players);
     setOnlineRaceData({
       ...onlineRaceData,
       playerData: players.map(({ uid, displayName }) => ({

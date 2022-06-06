@@ -54,20 +54,17 @@ export default function InboxComponent() {
     setLoading(true);
     declineFriendRequest(currentUser, uid)
       .then((res) => {
-        console.log("xd");
         enqueueSnackbar(res.data, { variant: "success" });
         setFriendRequests((prev) =>
           prev.filter((val) => val.sender_id !== uid)
         );
       })
       .catch((err) => {
-        console.log("er");
         enqueueSnackbar(err.response?.data || err.message, {
           variant: "error",
         });
       })
       .finally(() => {
-        console.log("no");
         setLoading(false);
       });
   };

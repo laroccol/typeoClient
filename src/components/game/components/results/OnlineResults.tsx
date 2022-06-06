@@ -188,7 +188,7 @@ export default function OnlineResults({
                 }}
                 sx={{ mx: 2 }}
               >
-                Find Match
+                <Typography>Find Match</Typography>
               </Button>
               <Button
                 variant="contained"
@@ -197,7 +197,7 @@ export default function OnlineResults({
                 }}
                 sx={{ mx: 2 }}
               >
-                Exit
+                <Typography>Exit</Typography>
               </Button>
             </Box>
           </GridCard>

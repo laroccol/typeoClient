@@ -27,6 +27,8 @@ import { ResultsData } from "../../../../constants/race";
 import { useHistory } from "react-router-dom";
 import { JoinQueue } from "../../../../api/sockets/matchmaking";
 import { useSocketContext } from "../../../../contexts/SocketContext";
+import { CharacterData } from "../../../../constants/race";
+import StatKeyboard from "../../../stats/components/StatKeyboard";
 
 ChartJS.register(
   CategoryScale,
@@ -48,16 +50,25 @@ interface ResultsProps {
 export default function Results({
   open,
   setOpen,
-  data: { startTime, dataPoints, accuracy, characters, testType },
+  data: {
+    startTime,
+    dataPoints,
+    accuracy,
+    characters,
+    testType,
+    characterDataPoints,
+  },
 }: ResultsProps) {
   const [graphData, setGraphData] = React.useState<GraphData>();
   const [wpm, setWPM] = React.useState<number>(0);
+  const [keyData, setKeyData] = React.useState<number[]>(new Array(26).fill(0));
 
   const { socket } = useSocketContext();
   const history = useHistory();
   const theme = useTheme();
 
   React.useEffect(() => {
+    setKeyData(parseCharacterTrackingDate(characterDataPoints));
     // Update Graph
     if (dataPoints.length < 1) return;
 
@@ -117,7 +128,11 @@ export default function Results({
         }}
         maxWidth="lg"
       >
-        <Box p={3} textAlign="center" sx={{ overflow: "hidden" }}>
+        <Box
+          p={3}
+          textAlign="center"
+          sx={{ overflowX: "hidden", overflowY: "scroll" }}
+        >
           <GridCard
             sx={{
               marginBottom: 3,
@@ -179,10 +194,11 @@ export default function Results({
                 }}
                 sx={{ mx: 2 }}
               >
-                Exit
+                <Typography>Exit</Typography>
               </Button>
             </Box>
           </GridCard>
+          {/* <StatKeyboard data={keyData} /> */}
           {graphData ? (
             <GridCard>
               <Box height="50vh" width="50vw">
@@ -213,3 +229,27 @@ export default function Results({
     </>
   );
 }
+
+const parseCharacterTrackingDate = (characterDataPoints: CharacterData[]) => {
+  const characterSpeeds = new Array(26).fill(0);
+  const characterCount = new Array(26).fill(0);
+  for (const [index, dataPoint] of characterDataPoints.entries()) {
+    if (
+      index === 0 ||
+      !/^[a-z]$/.test(dataPoint.character) ||
+      !dataPoint.isCorrect
+    )
+      continue;
+    console.log(dataPoint.timestamp - characterDataPoints[index - 1].timestamp);
+    const charSpeed =
+      0.2 /
+      ((dataPoint.timestamp - characterDataPoints[index - 1].timestamp) /
+        60000);
+    const charIndex = dataPoint.character.charCodeAt(0) - 97;
+    characterCount[charIndex]++;
+    characterSpeeds[charIndex] =
+      characterSpeeds[charIndex] +
+      (charSpeed - characterSpeeds[charIndex]) / characterCount[charIndex];
+  }
+  return characterSpeeds;
+};

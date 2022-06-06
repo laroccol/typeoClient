@@ -96,8 +96,13 @@ export default function UpdateProfileComponent(props: any) {
       messageOpen={messageOpen}
       loading={loading}
       fields={[
-        { name: "email", label: "Email Address", autoComplete: "email" },
-        { name: "username", label: "Username", autoComplete: "username" },
+        { name: "username", type: "text", label: "Username", autoComplete: "" },
+        {
+          name: "email",
+          type: "email",
+          label: "Email Address",
+          autoComplete: "",
+        },
       ]}
       fillDefaults={{
         email: currentUser.email!,

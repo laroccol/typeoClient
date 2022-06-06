@@ -46,7 +46,12 @@ export default function ForgotPasswordComponent() {
       message={message}
       loading={loading}
       fields={[
-        { name: "email", label: "Email Address", autoComplete: "email" },
+        {
+          name: "email",
+          type: "email",
+          label: "Email Address",
+          autoComplete: "",
+        },
       ]}
       handleSubmit={handleSubmit}
       signupLink

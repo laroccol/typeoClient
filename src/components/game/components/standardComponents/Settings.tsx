@@ -19,15 +19,27 @@ import Filter1Icon from "@mui/icons-material/Filter1";
 
 const GameTypeIcons = [
   <DoDisturbIcon key="noneIcon" />,
-  "Time",
-  "Words",
-  "Errors",
+  <Typography key="timeSetting" fontSize="small">
+    Time
+  </Typography>,
+  <Typography key="wordsSetting" fontSize="small">
+    Word
+  </Typography>,
+  <Typography key="errorsSetting" fontSize="small">
+    Error
+  </Typography>,
 ];
 
 const TextTypeIcons = [
-  <ImportContactsIcon key="contactsIcon" />,
-  "1000",
-  <Filter1Icon key="numbersIcon" />,
+  <Typography key="passageTextType" fontSize="small">
+    Passage
+  </Typography>,
+  <Typography key="topWordsTextType" fontSize="small">
+    Top Words
+  </Typography>,
+  <Typography key="numberTextType" fontSize="small">
+    Numbers
+  </Typography>,
 ];
 
 export default function Settings() {
@@ -97,7 +109,7 @@ export default function Settings() {
                       : "inherit"
                   }
                 >
-                  {amount}
+                  <Typography fontSize="small">{amount}</Typography>
                 </Button>
               )
             )}

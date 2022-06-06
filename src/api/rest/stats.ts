@@ -40,7 +40,6 @@ export const useRaceStats = (timeframe: number) => {
   };
 
   React.useEffect(() => {
-    console.log(timeframe, largestTimeframe);
     if (
       largestTimeframe === Timeframes.ALL_TIME ||
       timeframe <= largestTimeframe

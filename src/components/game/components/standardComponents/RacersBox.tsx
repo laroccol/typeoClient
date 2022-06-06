@@ -34,7 +34,7 @@ export default function RacersBox({ racerData }: RacersBoxProps) {
                   transform: "translate(-50%, -50%)",
                 }}
               >
-                {racer.displayName.substring(0, 15)}
+                {racer.displayName?.substring(0, 15)}
               </Typography>
             </Grid>
             <Grid item xs={9}>

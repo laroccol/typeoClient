@@ -33,6 +33,7 @@ interface RaceState {
   errorIndex: number; // The index where the user made an error and must go back to
   wordsTyped: number; // The number of words typed (Regardless if they are correct or not)
   prevInput: string;
+  prevKey: string;
   overflowCount: number; // Detect if we have gone past the last character in the passage
 }
 
@@ -79,6 +80,7 @@ export default function useRaceLogic({
     errorIndex: 0,
     wordsTyped: 0,
     prevInput: "",
+    prevKey: "",
     overflowCount: 0,
   });
 
@@ -97,6 +99,7 @@ export default function useRaceLogic({
       accuracy: 0,
       characters: { correct: 0, incorrect: 0, total: 0 },
       testType: { name: "", textType: "" },
+      characterDataPoints: [],
     },
   });
 
@@ -118,18 +121,41 @@ export default function useRaceLogic({
     const textType = settings.textType;
     const gameInfo = settings.gameInfo;
 
-    const newPassage = passage || getPassage(textType);
-    const newWords = newPassage.split(" ");
+    let newPassage = passage || getPassage(textType);
+
+    if (gameInfo.type === GameTypes.TIMED) {
+      newPassage = `${newPassage} ${getPassage(textType)} ${getPassage(
+        textType
+      )} ${getPassage(textType)}`;
+    }
+
+    let newWords = newPassage.split(" ");
 
     if (gameInfo.type === GameTypes.WORDS) {
+      while (newWords.length < gameInfo.amount!) {
+        newWords = [...newWords, ...getPassage(textType).split(" ")];
+      }
       newWords.length = gameInfo.amount || 0;
-      newWords.length -= newWords.length - 2;
     }
 
     setRaceInfo({
       ...raceInfo,
       textAreaText: newWords.join(" ").trim(),
       words: newWords,
+    });
+  };
+
+  const AddPasageLength = () => {
+    const textType = settings.textType;
+
+    const newTextAreaText = `${raceInfo.textAreaText} ${getPassage(
+      textType
+    )} ${getPassage(textType)}`;
+
+    setRaceInfo({
+      ...raceInfo,
+      textAreaText: newTextAreaText,
+      words: newTextAreaText.split(" "),
     });
   };
 
@@ -159,14 +185,11 @@ export default function useRaceLogic({
           amount: settings.gameInfo.amount,
           textType: TextTypeNames[settings.textType],
         },
+        characterDataPoints: prevStatState.characterTrackingData,
       };
 
       try {
-        RaceAPI.sendRaceData(
-          currentUser,
-          resultsData,
-          prevStatState.characterTrackingData
-        );
+        RaceAPI.sendRaceData(currentUser, resultsData);
       } catch (err) {
         console.error(err);
       }
@@ -189,6 +212,7 @@ export default function useRaceLogic({
       errorIndex: 0,
       wordsTyped: 0,
       prevInput: "",
+      prevKey: "",
       overflowCount: 0,
     });
 
@@ -203,6 +227,7 @@ export default function useRaceLogic({
         accuracy: 0,
         characters: { correct: 0, incorrect: 0, total: 0 },
         testType: { name: "", textType: "" },
+        characterDataPoints: [],
       },
     });
 
@@ -256,13 +281,14 @@ export default function useRaceLogic({
         1 +
         raceState.overflowCount;
 
+      if (raceState.prevKey.length === 1) newRaceState.currentCharIndex -= 2;
+
       if (newRaceState.currentCharIndex - 1 <= raceState.errorIndex)
         newRaceState.isCorrect = true;
       let letterEndIndex =
         raceInfo.words[raceState.wordsTyped].length -
         (raceState.currentCharIndex - raceState.currentWordIndex + 1);
 
-      console.log(raceState.currentCharIndex, newRaceState.currentCharIndex);
       for (
         let i = raceState.currentCharIndex;
         i >= newRaceState.currentCharIndex;
@@ -282,6 +308,9 @@ export default function useRaceLogic({
       newRaceState.currentWordIndex =
         newRaceState.currentCharIndex -
         (raceInfo.words[newRaceState.wordsTyped].length - letterEndIndex);
+
+      newRaceState.isCorrect =
+        raceInfo.words[newRaceState.wordsTyped].startsWith(inputVal);
       setRaceState(newRaceState);
     }
     if (
@@ -297,7 +326,13 @@ export default function useRaceLogic({
           raceState.wordsTyped + 1
         );
       }
-      OnEndRace();
+      console.log("Ending Race On Change");
+      if (
+        amount <= 0 ||
+        settings.gameInfo.type === GameTypes.WORDS ||
+        settings.gameInfo.type === GameTypes.ERRORS
+      )
+        OnEndRace();
     }
   };
 
@@ -393,6 +428,7 @@ export default function useRaceLogic({
     }
 
     newRaceState.prevInput = inputVal;
+    newRaceState.prevKey = key;
     setRaceState(newRaceState);
   };
 
@@ -404,7 +440,8 @@ export default function useRaceLogic({
         characterTrackingData: [
           ...prevStatState.characterTrackingData,
           {
-            charIndex: raceState.currentCharIndex,
+            charIndex: raceState.currentCharIndex - 1,
+            character: raceInfo.textAreaText[raceState.currentCharIndex - 1],
             isCorrect: raceState.isCorrect,
             timestamp: Date.now(),
           },
@@ -435,6 +472,12 @@ export default function useRaceLogic({
         setAmount(gameInfo.amount - raceState.wordsTyped);
       }
     }
+
+    if (
+      gameInfo.type === GameTypes.TIMED &&
+      raceInfo.words.length - raceState.wordsTyped < 20
+    )
+      AddPasageLength();
   }, [raceState.wordsTyped]);
 
   React.useEffect(() => {
@@ -444,8 +487,12 @@ export default function useRaceLogic({
   }, [testDisabled]);
 
   React.useEffect(() => {
-    console.log(amount);
-    if (settings.gameInfo.type !== GameTypes.NONE && amount <= 0) {
+    if (
+      settings.gameInfo.type !== GameTypes.NONE &&
+      amount <= 0 &&
+      raceStatus.isRaceRunning
+    ) {
+      console.log("Ending Race On Amounts");
       OnEndRace();
     }
   }, [amount]);

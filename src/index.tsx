@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import ReactGA from "react-ga";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Router from "./Router";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -8,6 +9,9 @@ import { GameSettingsProvider } from "./contexts/GameSettings";
 import { SocketProvider } from "./contexts/SocketContext";
 import { SnackbarProvider } from "notistack";
 import ChatBox from "./components/chat/ChatBox";
+
+const TRACKING_ID = "UA-230352416-1"; // YOUR_OWN_TRACKING_ID
+ReactGA.initialize(TRACKING_ID);
 
 const theme = createTheme({
   palette: {
@@ -34,6 +38,9 @@ const theme = createTheme({
       default: "#37474f",
       paper: "#263238",
       //incorrect: "rgba(255,0,0,0.25)",
+    },
+    grey: {
+      900: "#182024",
     },
     //solid: {
     //main: "#ff0000",

@@ -35,6 +35,7 @@ const StyledForm = styled("form")(({ theme }) => ({
 
 interface Field {
   name: string;
+  type: string;
   label: string;
   autoComplete: string;
 }
@@ -92,13 +93,13 @@ export default function ProfileComponent({
             {fields.map((val, i) => {
               return (
                 <StyledTextField
-                  key={val.name}
+                  key={`${val.name}_${i}`}
                   margin="normal"
                   required
                   fullWidth
                   id={val.name}
                   label={val.label}
-                  type={val.name}
+                  type={val.type}
                   name={val.name}
                   defaultValue={
                     fillDefaults && fillDefaults[val.name]
@@ -119,7 +120,7 @@ export default function ProfileComponent({
               sx={{ mt: 2 }}
               disabled={loading}
             >
-              {name}
+              <Typography>{name}</Typography>
             </Button>
           </StyledForm>
           <Grid

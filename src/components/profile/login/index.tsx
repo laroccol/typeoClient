@@ -30,6 +30,7 @@ export default function LoginComponent() {
     try {
       await login(email, password);
       history.push("/");
+      history.go(0);
     } catch (err: any) {
       setErrorOpen(true);
       setError(err.message);
@@ -44,9 +45,15 @@ export default function LoginComponent() {
       error={error}
       loading={loading}
       fields={[
-        { name: "email", label: "Email Address", autoComplete: "email" },
+        {
+          name: "email",
+          type: "email",
+          label: "Email Address",
+          autoComplete: "email",
+        },
         {
           name: "password",
+          type: "password",
           label: "Password",
           autoComplete: "current-password",
         },

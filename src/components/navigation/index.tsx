@@ -3,6 +3,7 @@ import { styled, useTheme, Theme, CSSObject } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { Link, useLocation } from "react-router-dom";
+import MuiLink from "@mui/material/Link";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -22,10 +23,12 @@ import Badge from "@mui/material/Badge";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import KeyboardIcon from "@mui/icons-material/Keyboard";
+import GroupsIcon from "@mui/icons-material/Groups";
 import PeopleIcon from "@mui/icons-material/People";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import HomeIcon from "@mui/icons-material/Home";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import QueryStatsIcon from "@mui/icons-material/QueryStats";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
@@ -34,7 +37,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useHistory } from "react-router-dom";
 import { Button, Tooltip, Typography } from "@mui/material";
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -133,10 +136,11 @@ export default function MiniDrawer(props: MiniDrawerProps) {
     history.push("/login");
   };
 
-  const Logout = () => {
-    logout();
+  const Logout = async () => {
+    await logout();
     setAnchorEl(null);
     history.push("/");
+    history.go(0);
   };
 
   const UpdateProfile = () => {
@@ -191,7 +195,7 @@ export default function MiniDrawer(props: MiniDrawerProps) {
           >
             <MenuIcon />
           </IconButton>
-          <Box sx={{ flexGrow: 1 }} onClick={() => history.push("/")}>
+          <Box sx={{ flexGrow: 0.1 }} onClick={() => history.push("/")}>
             <Link to="/" style={{ textDecoration: "none" }}>
               <img
                 src={"typeoLogo.png"}
@@ -203,6 +207,17 @@ export default function MiniDrawer(props: MiniDrawerProps) {
                 BETA
               </Typography>
             </Link>
+          </Box>
+          <Box display="inline-block" flexGrow={1}>
+            <span className="iconify" data-icon="mdi:discord"></span>
+            <MuiLink
+              href="https://discord.gg/S67MSChK"
+              target="_blank"
+              color="secondary"
+              ml={2}
+            >
+              <Typography display="inline">Join Our Discord</Typography>
+            </MuiLink>
           </Box>
           <Typography mx={1}>
             {isLoggedIn && currentUser.displayName
@@ -262,9 +277,13 @@ export default function MiniDrawer(props: MiniDrawerProps) {
         <List>
           {[
             { name: "Home", icon: <HomeIcon />, click: Home },
-            { name: "Find Match", icon: <KeyboardIcon />, click: FindMatch },
+            {
+              name: "Find Online Match",
+              icon: <GroupsIcon />,
+              click: FindMatch,
+            },
+            { name: "Stats", icon: <QueryStatsIcon />, click: Stats },
             { name: "Friends", icon: <PeopleIcon />, click: Friends },
-            { name: "Stats", icon: <BarChartIcon />, click: Stats },
             { name: "Inbox", icon: <MailIcon />, click: Inbox },
           ].map((val, index) => (
             <Tooltip title={val.name} key={val.name} placement="right">

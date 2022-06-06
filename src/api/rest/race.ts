@@ -18,14 +18,12 @@ export const getPassage = async (type: number): Promise<string> => {
 
 export const sendRaceData = async (
   currentUser: Firebase.User | GuestUser,
-  resultsData: ResultsData,
-  characterData: CharacterData[]
+  resultsData: ResultsData
 ) => {
   return axios.post(
     "/race/statreport",
     {
       resultsData: resultsData,
-      characterData: characterData,
     },
     { withCredentials: true, headers: await generateAuthHeader(currentUser) }
   );
