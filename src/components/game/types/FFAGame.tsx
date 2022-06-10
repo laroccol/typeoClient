@@ -102,7 +102,6 @@ export default function FFAGame() {
   ) => {
     if (passage === " ") setPassage(matchPassage);
     if (players.length === 1) setStatus(MatchStatus.WAITING_FOR_PLAYERS);
-    console.log(players);
     setOnlineRaceData({
       ...onlineRaceData,
       playerData: players.map(({ uid, displayName }) => ({

@@ -18,17 +18,30 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
+import { Line, Bar, Chart } from "react-chartjs-2";
 import { WPMData } from "../../../../constants/race";
 import "chartjs-adapter-date-fns";
 import { GridCard, HoverableText } from "../../../common";
-import { GraphData } from "../../../../constants/graphs";
+import {
+  BarChartData,
+  ChartData,
+  GraphData,
+} from "../../../../constants/graphs";
 import { ResultsData } from "../../../../constants/race";
 import { useHistory } from "react-router-dom";
 import { JoinQueue } from "../../../../api/sockets/matchmaking";
 import { useSocketContext } from "../../../../contexts/SocketContext";
 import { CharacterData } from "../../../../constants/race";
 import StatKeyboard from "../../../stats/components/StatKeyboard";
+import {
+  getCharacterSpeed,
+  getMissedCharacterSequences,
+} from "../../../../api/rest/stats";
+import MissedSequences from "../../../stats/components/MissedSequences";
+import {
+  calculateWPMBackgroundColor,
+  calculateWPMColor,
+} from "../../feedback/SpeedProgress";
 
 ChartJS.register(
   CategoryScale,
@@ -51,6 +64,7 @@ export default function Results({
   open,
   setOpen,
   data: {
+    passage,
     startTime,
     dataPoints,
     accuracy,
@@ -59,7 +73,7 @@ export default function Results({
     characterDataPoints,
   },
 }: ResultsProps) {
-  const [graphData, setGraphData] = React.useState<GraphData>();
+  const [graphData, setGraphData] = React.useState<ChartData>();
   const [wpm, setWPM] = React.useState<number>(0);
   const [keyData, setKeyData] = React.useState<number[]>(new Array(26).fill(0));
 
@@ -68,14 +82,14 @@ export default function Results({
   const theme = useTheme();
 
   React.useEffect(() => {
-    setKeyData(parseCharacterTrackingDate(characterDataPoints));
+    setKeyData(getCharacterSpeed(characterDataPoints));
     // Update Graph
     if (dataPoints.length < 1) return;
 
-    let newData;
+    let averageWpmData: { x: string; y: number }[];
     if (dataPoints.length < 3) {
       const dataPoint = dataPoints[dataPoints.length - 1];
-      newData = [
+      averageWpmData = [
         { x: "0", y: dataPoint.wpm },
         {
           x: ((dataPoint.timestamp - startTime) / 1000).toFixed(1),
@@ -88,7 +102,7 @@ export default function Results({
           dataPoints[0].timestamp +
           1000) /
         1000;
-      newData = dataPoints.map((val, index) => {
+      averageWpmData = dataPoints.map((val, index) => {
         return {
           x:
             index !== dataPoints.length - 1
@@ -99,18 +113,49 @@ export default function Results({
       });
 
       if (totalTestTime - dataPoints.length < 0.15) {
-        newData.splice(newData.length - 1, 1);
+        averageWpmData.splice(averageWpmData.length - 1, 1);
       }
     }
+
+    const sectionWpmData = averageWpmData.map(({ x, y }, index) => {
+      if (index === 0) return { x, y };
+      return {
+        x,
+        y:
+          (y - averageWpmData[index - 1].y) * index +
+          averageWpmData[index - 1].y,
+      };
+    });
+
+    const barBorderColors = sectionWpmData.map(({ y: wpm }) =>
+      calculateWPMColor(wpm)
+    );
+
+    const barBackgroundColors = sectionWpmData.map(({ y: wpm }) =>
+      calculateWPMBackgroundColor(wpm)
+    );
 
     setGraphData({
       datasets: [
         {
-          label: " wpm ",
-          data: newData,
+          type: "line",
+          label: " average wpm ",
+          data: averageWpmData,
           fill: true,
           borderColor: theme.palette.primary.main,
           tension: 0.1,
+          order: 1,
+        },
+        {
+          type: "bar",
+          label: " section wpm ",
+          data: sectionWpmData,
+          fill: true,
+          borderColor: barBorderColors,
+          borderWidth: 1,
+          backgroundColor: barBackgroundColors,
+          maxBarThickness: 50,
+          order: 2,
         },
       ],
     });
@@ -198,12 +243,12 @@ export default function Results({
               </Button>
             </Box>
           </GridCard>
-          {/* <StatKeyboard data={keyData} /> */}
           {graphData ? (
             <GridCard>
               <Box height="50vh" width="50vw">
-                <Line
+                <Chart
                   data={graphData}
+                  type="line"
                   options={{
                     maintainAspectRatio: false,
                     scales: {
@@ -216,6 +261,11 @@ export default function Results({
                       yAxes: {
                         ticks: {
                           maxTicksLimit: 5,
+                          callback: function (value: number | string) {
+                            if ((value as number) % 1 === 0) {
+                              return value;
+                            }
+                          },
                         },
                       },
                     },
@@ -224,32 +274,16 @@ export default function Results({
               </Box>
             </GridCard>
           ) : null}
+          <StatKeyboard data={keyData} title="Key Speed" />
+          <MissedSequences
+            missedSequences={getMissedCharacterSequences(
+              {},
+              characterDataPoints,
+              passage
+            )}
+          />
         </Box>
       </Dialog>
     </>
   );
 }
-
-const parseCharacterTrackingDate = (characterDataPoints: CharacterData[]) => {
-  const characterSpeeds = new Array(26).fill(0);
-  const characterCount = new Array(26).fill(0);
-  for (const [index, dataPoint] of characterDataPoints.entries()) {
-    if (
-      index === 0 ||
-      !/^[a-z]$/.test(dataPoint.character) ||
-      !dataPoint.isCorrect
-    )
-      continue;
-    console.log(dataPoint.timestamp - characterDataPoints[index - 1].timestamp);
-    const charSpeed =
-      0.2 /
-      ((dataPoint.timestamp - characterDataPoints[index - 1].timestamp) /
-        60000);
-    const charIndex = dataPoint.character.charCodeAt(0) - 97;
-    characterCount[charIndex]++;
-    characterSpeeds[charIndex] =
-      characterSpeeds[charIndex] +
-      (charSpeed - characterSpeeds[charIndex]) / characterCount[charIndex];
-  }
-  return characterSpeeds;
-};

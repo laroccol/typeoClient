@@ -40,6 +40,7 @@ export default function Leaderboard({ title, players }: LeaderboardProps) {
     },
     title === "Daily" ? 1000 : null
   );
+
   return (
     <GridCard textalign="center" sx={{ pt: 5, position: "relative" }}>
       <Typography variant="h3" display="inline" color="secondary">
@@ -82,16 +83,6 @@ export default function Leaderboard({ title, players }: LeaderboardProps) {
           wpm={wpm}
         />
       ))}
-      {/* <LeaderboardItem
-        place={1}
-        name="lukedamosdflkjslksdj"
-        accuracy={104.3}
-        wpm={104.3}
-      />
-      <LeaderboardItem place={2} name="𒐫𒐫𒐫𒐫𒐫" accuracy={104.3} wpm={104.3} />
-      <LeaderboardItem place={3} name="luke" accuracy={104.3} wpm={104.3} />
-      <LeaderboardItem place={4} name="luke" accuracy={104.3} wpm={104.3} />
-      <LeaderboardItem place={5} name="luke" accuracy={104.3} wpm={104.3} /> */}
     </GridCard>
   );
 }

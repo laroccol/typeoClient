@@ -152,7 +152,6 @@ export default function StandardGame({
     wordIndex: number,
     index: number
   ) => {
-    console.log(charStyle);
     if (!(wbRef.current && wbRef.current.children[wordIndex])) return;
     const charDiv = wbRef.current.children[wordIndex].children[index];
     if (!charDiv) return;
@@ -259,11 +258,6 @@ export default function StandardGame({
         }
       }
       if (raceState.prevKey.length === 1) {
-        console.log(raceState.isCorrect);
-        console.log(
-          raceState.wordsTyped,
-          raceState.currentCharIndex - raceState.currentWordIndex - 1
-        );
         if (!raceState.isCorrect) {
           setCharStyle(
             CharStyle.INCORRECT,
@@ -271,7 +265,6 @@ export default function StandardGame({
             raceState.currentCharIndex - raceState.currentWordIndex - 1
           );
         } else {
-          console.log("HERE");
           setCharStyle(
             CharStyle.CORRECT,
             raceState.wordsTyped,

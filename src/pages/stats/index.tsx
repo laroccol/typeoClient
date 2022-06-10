@@ -13,13 +13,13 @@ export default function Stats() {
   return (
     <>
       <Grid container spacing={3} marginTop={2}>
-        <Grid item xs={2}></Grid>
-        <Grid item xs={8}>
+        <Grid item xs={0.5}></Grid>
+        <Grid item xs={11}>
           <Grid container spacing={3}>
             <MainStats />
           </Grid>
         </Grid>
-        <Grid item xs={2}></Grid>
+        <Grid item xs={0.5}></Grid>
       </Grid>
     </>
   );

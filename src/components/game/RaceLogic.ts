@@ -441,7 +441,7 @@ export default function useRaceLogic({
           ...prevStatState.characterTrackingData,
           {
             charIndex: raceState.currentCharIndex - 1,
-            character: raceInfo.textAreaText[raceState.currentCharIndex - 1],
+            character: raceState.prevKey,
             isCorrect: raceState.isCorrect,
             timestamp: Date.now(),
           },
@@ -502,6 +502,7 @@ export default function useRaceLogic({
   }, [statState.resultsData]);
 
   React.useEffect(() => {
+    if (raceState.prevKey.length > 1) return;
     addCharacterDataPoint();
   }, [raceState.currentCharIndex]);
 

@@ -1,8 +1,14 @@
 import React from "react";
 import { Box, Button, Tooltip, Typography } from "@mui/material";
 import { calculateWPMColor } from "../../game/feedback/SpeedProgress";
+import { GridCard } from "../../common";
 
-export default function StatKeyboard({ data }: { data: number[] }) {
+interface StatKeyboardProps {
+  data: number[];
+  title: string;
+}
+
+export default function StatKeyboard({ data, title }: StatKeyboardProps) {
   const filteredData = data.filter((wpm) => wpm !== 0);
   const min = Math.min(...filteredData);
   const max = Math.max(...filteredData);
@@ -16,7 +22,7 @@ export default function StatKeyboard({ data }: { data: number[] }) {
     const keySpeed = data[keyboardKey.charCodeAt(0) - 97];
     return (
       <Tooltip
-        title={keySpeed === 0 ? "None" : `WPM: ${keySpeed.toFixed(1)}`}
+        title={keySpeed ? `WPM: ${keySpeed.toFixed(1)}` : "None"}
         placement="top"
       >
         <Button
@@ -24,19 +30,20 @@ export default function StatKeyboard({ data }: { data: number[] }) {
           color="secondary"
           id={keyboardKey}
           sx={{
-            minHeight: 65,
-            minWidth: 65,
+            minHeight: 50,
+            minWidth: 50,
             m: 1,
             textTransform: "none",
-            backgroundColor:
-              keySpeed === 0
-                ? "inherit"
-                : calculateKeySpeedColor(keySpeed, min, max),
+            borderColor: keySpeed
+              ? calculateKeySpeedColor(keySpeed, min, max)
+              : "inherit",
+            backgroundColor: keySpeed
+              ? calculateKeySpeedBackgroundColor(keySpeed, min, max)
+              : "inherit",
             "&:hover": {
-              backgroundColor:
-                keySpeed === 0
-                  ? "inherit"
-                  : calculateKeySpeedColor(keySpeed, min, max),
+              backgroundColor: keySpeed
+                ? calculateKeySpeedBackgroundColor(keySpeed, min, max)
+                : "inherit",
               opacity: 0.8,
             },
           }}
@@ -48,7 +55,10 @@ export default function StatKeyboard({ data }: { data: number[] }) {
   };
 
   return (
-    <Box mb={50} textAlign="center">
+    <GridCard sx={{ my: 3, textAlign: "center" }}>
+      <Typography variant="h5" p={2}>
+        {title}
+      </Typography>
       <Box>
         <KeyboardButton keyboardKey="q" />
         <KeyboardButton keyboardKey="w" />
@@ -81,7 +91,7 @@ export default function StatKeyboard({ data }: { data: number[] }) {
         <KeyboardButton keyboardKey="n" />
         <KeyboardButton keyboardKey="m" />
       </Box>
-    </Box>
+    </GridCard>
   );
 }
 
@@ -93,7 +103,18 @@ export function calculateKeySpeedColor(
   const percentage = (wpm - min) / (max - min);
   const red = (1 - percentage) * 255 + 50;
   const green = percentage * 255 + 50;
-  return `rgb(${red},${green},50)`;
+  return `rgb(${red},${green},80)`;
+}
+
+export function calculateKeySpeedBackgroundColor(
+  wpm: number,
+  min: number,
+  max: number
+): string {
+  const percentage = (wpm - min) / (max - min);
+  const red = (1 - percentage) * 255 + 50;
+  const green = percentage * 255 + 50;
+  return `rgba(${red},${green},100, 0.4)`;
 }
 
 function clamp(num: number, min: number, max: number): number {

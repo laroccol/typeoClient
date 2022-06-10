@@ -10,6 +10,8 @@ import {
   Leaderboard,
   LeaderboardSchema,
 } from "../../constants/schemas/leaderboard";
+import HomeProfile from "../../components/profile/display/HomeProfile";
+import { Box } from "@mui/material";
 
 interface HomeProps {
   location?: {
@@ -67,7 +69,9 @@ export default function Home(props: HomeProps) {
     <>
       <Grid container spacing={3}>
         <Grid item xs={1.5}>
-          {/* {currentUser.uid} */}
+          <Box mt={15}>
+            <HomeProfile />
+          </Box>
         </Grid>
         <Grid item xs={9}>
           <SoloGame />

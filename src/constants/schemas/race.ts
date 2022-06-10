@@ -1,7 +1,10 @@
+import { CharacterData } from "../race";
+
 export interface RaceSchema {
+  passage: string;
   wpm: number;
   accuracy: number;
-  mostMissedCharacter: string;
+  characterDataPoints: CharacterData[];
   testType: { name: string; amount?: number };
   timestamp: string;
 }

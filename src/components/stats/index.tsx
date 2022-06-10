@@ -35,6 +35,7 @@ import { RaceStats, StatsStructure, Timeframes } from "../../constants/stats";
 import { useAuth } from "../../contexts/AuthContext";
 import { GridCard } from "../common";
 import StatKeyboard from "./components/StatKeyboard";
+import MissedSequences from "./components/MissedSequences";
 
 ChartJS.register(TimeScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -45,14 +46,34 @@ export default function MainStats() {
   const [graphTimeframe, setGraphTimeframe] = React.useState<number>(
     Timeframes.LAST_100
   );
+  const [keySpeedTimeframe, setKeySpeedTimeframe] = React.useState<number>(
+    Timeframes.LAST_100
+  );
+
+  const [missedSequenceTimeframe, setMissedSequenceTimeframe] =
+    React.useState<number>(Timeframes.LAST_100);
+
   const [tabIndex, setTabIndex] = React.useState<number>(0);
   const [stats, setStats] = React.useState<StatsStructure>({
-    averages: { wpm: 0, accuracy: 0, mostMissedCharacter: "None" },
-    best: { wpm: 0, accuracy: 0, mostMissedCharacter: "None" },
+    averages: {
+      wpm: 0,
+      accuracy: 0,
+      mostMissedCharacter: "None",
+      characterSpeed: [],
+    },
+    best: {
+      wpm: 0,
+      accuracy: 0,
+    },
   });
 
   const { races, getStats } = useRaceStats(
-    statTimeframe > graphTimeframe ? statTimeframe : graphTimeframe
+    Math.max(
+      statTimeframe,
+      graphTimeframe,
+      keySpeedTimeframe,
+      missedSequenceTimeframe
+    )
   );
 
   const { isLoggedIn, currentUser } = useAuth();
@@ -66,6 +87,14 @@ export default function MainStats() {
     setGraphTimeframe(parseInt(event.target.value));
   };
 
+  const handleKeySpeedTimeframeChange = (event: SelectChangeEvent) => {
+    setKeySpeedTimeframe(parseInt(event.target.value));
+  };
+
+  const handleMissedSequenceTimeframeChange = (event: SelectChangeEvent) => {
+    setMissedSequenceTimeframe(parseInt(event.target.value));
+  };
+
   const handleTabChange = (event: React.SyntheticEvent, value: number) => {
     setTabIndex(value);
   };
@@ -75,8 +104,10 @@ export default function MainStats() {
   };
 
   React.useEffect(() => {
-    setStats(getStats(statTimeframe));
-  }, [statTimeframe, races]);
+    setStats(
+      getStats(statTimeframe, keySpeedTimeframe, missedSequenceTimeframe)
+    );
+  }, [statTimeframe, keySpeedTimeframe, missedSequenceTimeframe, races]);
 
   if (!isLoggedIn)
     return (
@@ -94,27 +125,8 @@ export default function MainStats() {
 
   return (
     <>
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: "divider",
-          mb: 2,
-          width: "100%",
-        }}
-      >
-        <Tabs value={tabIndex} onChange={handleTabChange} textColor="secondary">
-          <Tab label="Stats" />
-          <Tab label="Graphs" />
-        </Tabs>
-      </Box>
-      <SwipeableViews
-        index={tabIndex}
-        onChangeIndex={handleTabChangeIndex}
-        containerStyle={{
-          transition: "transform 0.35s cubic-bezier(0.15, 0.3, 0.25, 1) 0s",
-        }}
-      >
-        <Box>
+      <Grid container spacing={3}>
+        <Grid item xs={6}>
           <FormControl variant="standard" sx={{ minWidth: 200 }}>
             <InputLabel id="averages-timeframe-label">Timeframe</InputLabel>
             <Select
@@ -132,56 +144,98 @@ export default function MainStats() {
           </FormControl>
           <StatSection title="Averages" data={stats?.averages} />
           <StatSection title="Best Race" data={stats?.best} />
-        </Box>
-        <Grid container spacing={3}>
-          <Grid item xs={2}>
-            <FormControl variant="standard" sx={{ minWidth: 200 }}>
-              <InputLabel id="averages-timeframe-label">Timeframe</InputLabel>
-              <Select
-                label="Timeframe"
-                labelId="averages-timeframe-label"
-                value={`${graphTimeframe}`}
-                onChange={handleGraphTimeframeChange}
-              >
-                <MenuItem value={Timeframes.ALL_TIME}>All Time</MenuItem>
-                <MenuItem value={Timeframes.LAST_100}>Last 100 Races</MenuItem>
-                <MenuItem value={Timeframes.LAST_50}>Last 50 Races</MenuItem>
-                <MenuItem value={Timeframes.LAST_25}>Last 25 Races</MenuItem>
-                <MenuItem value={Timeframes.LAST_10}>Last 10 Races</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={11.5}>
-            <Line
-              data={generateGraphDataFromRaces(races, graphTimeframe, theme)}
-              options={{
-                scales: {
-                  xAxes: {
-                    type: "time",
-                    ticks: {
-                      maxTicksLimit: 30,
-                    },
-                  },
-                  yAxes: {
-                    ticks: {
-                      maxTicksLimit: 20,
-                    },
+          {stats?.averages.missedTwoLetterSequences ? (
+            <>
+              <FormControl variant="standard" sx={{ minWidth: 200 }}>
+                <InputLabel id="missedsequence-timeframe-label">
+                  Timeframe
+                </InputLabel>
+                <Select
+                  label="Timeframe"
+                  labelId="missedsequence-timeframe-label"
+                  value={`${keySpeedTimeframe}`}
+                  onChange={handleMissedSequenceTimeframeChange}
+                >
+                  <MenuItem value={Timeframes.ALL_TIME}>All Time</MenuItem>
+                  <MenuItem value={Timeframes.LAST_100}>
+                    Last 100 Races
+                  </MenuItem>
+                  <MenuItem value={Timeframes.LAST_50}>Last 50 Races</MenuItem>
+                  <MenuItem value={Timeframes.LAST_25}>Last 25 Races</MenuItem>
+                  <MenuItem value={Timeframes.LAST_10}>Last 10 Races</MenuItem>
+                </Select>
+              </FormControl>
+              <MissedSequences
+                missedSequences={stats.averages.missedTwoLetterSequences}
+              />
+            </>
+          ) : null}
+        </Grid>
+        <Grid item xs={6}>
+          <FormControl variant="standard" sx={{ minWidth: 200 }}>
+            <InputLabel id="averages-timeframe-label">Timeframe</InputLabel>
+            <Select
+              label="Timeframe"
+              labelId="averages-timeframe-label"
+              value={`${graphTimeframe}`}
+              onChange={handleGraphTimeframeChange}
+            >
+              <MenuItem value={Timeframes.ALL_TIME}>All Time</MenuItem>
+              <MenuItem value={Timeframes.LAST_100}>Last 100 Races</MenuItem>
+              <MenuItem value={Timeframes.LAST_50}>Last 50 Races</MenuItem>
+              <MenuItem value={Timeframes.LAST_25}>Last 25 Races</MenuItem>
+              <MenuItem value={Timeframes.LAST_10}>Last 10 Races</MenuItem>
+            </Select>
+          </FormControl>
+          <Line
+            style={{ paddingBottom: 20 }}
+            data={generateGraphDataFromRaces(races, graphTimeframe, theme)}
+            options={{
+              scales: {
+                xAxes: {
+                  type: "time",
+                  ticks: {
+                    maxTicksLimit: 30,
                   },
                 },
-              }}
-            />
-          </Grid>
+                yAxes: {
+                  ticks: {
+                    maxTicksLimit: 20,
+                  },
+                },
+              },
+            }}
+          />
+          {stats?.averages.characterSpeed ? (
+            <>
+              <FormControl variant="standard" sx={{ minWidth: 200 }}>
+                <InputLabel id="keyspeed-timeframe-label">Timeframe</InputLabel>
+                <Select
+                  label="Timeframe"
+                  labelId="keyspeed-timeframe-label"
+                  value={`${keySpeedTimeframe}`}
+                  onChange={handleKeySpeedTimeframeChange}
+                >
+                  <MenuItem value={Timeframes.ALL_TIME}>All Time</MenuItem>
+                  <MenuItem value={Timeframes.LAST_100}>
+                    Last 100 Races
+                  </MenuItem>
+                  <MenuItem value={Timeframes.LAST_50}>Last 50 Races</MenuItem>
+                  <MenuItem value={Timeframes.LAST_25}>Last 25 Races</MenuItem>
+                  <MenuItem value={Timeframes.LAST_10}>Last 10 Races</MenuItem>
+                </Select>
+              </FormControl>
+              <StatKeyboard
+                data={stats.averages.characterSpeed}
+                title="Key Speed"
+              />
+            </>
+          ) : null}
         </Grid>
-      </SwipeableViews>
-      {/* <StatKeyboard data={sampleData} /> */}
+      </Grid>
     </>
   );
 }
-
-const sampleData = [
-  100, 120, 100, 95, 113, 103, 92, 105, 95, 90, 102, 115, 100, 97, 110, 104, 87,
-  123, 130, 124, 113, 98, 117, 95, 100, 97,
-];
 
 const generateGraphDataFromRaces = (
   races: Array<RaceSchema>,

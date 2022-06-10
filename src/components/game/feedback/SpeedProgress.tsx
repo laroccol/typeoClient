@@ -72,9 +72,15 @@ export default function SpeedProgress({
 }
 
 export function calculateWPMColor(wpm: number): string {
-  const red = wpm * 3;
-  const green = wpm > 100 ? 255 - (wpm - 100) ** 1.203 : 255;
+  const green = wpm * 3;
+  const red = wpm > 100 ? 255 - (wpm - 100) ** 1.203 : 255;
   return `rgb(${red},${green},0)`;
+}
+
+export function calculateWPMBackgroundColor(wpm: number): string {
+  const green = wpm * 3;
+  const red = wpm > 100 ? 255 - (wpm - 100) ** 1.203 : 255;
+  return `rgba(${red},${green},0, 0.2)`;
 }
 
 function clamp(num: number, min: number, max: number): number {

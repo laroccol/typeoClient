@@ -1,4 +1,4 @@
-import { Divider, Grid, Box, Typography } from "@mui/material";
+import { Divider, Grid, Box, Typography, Tooltip } from "@mui/material";
 import React from "react";
 import { GridCard } from "../../common";
 import StatCard from "../components/StatCard";
@@ -10,30 +10,46 @@ interface StatSectionProps {
 }
 
 export default function StatSection({ data, title }: StatSectionProps) {
+  const GridStat = (name: string, value: string | number) => {
+    return (
+      <Grid
+        zeroMinWidth
+        key={`${name}_${value}`}
+        item
+        xs={12}
+        sm={12}
+        md={6}
+        lg={4}
+        xl={2.5}
+      >
+        <StatCard title={formatName(name)} stat={value} />
+      </Grid>
+    );
+  };
+
   return (
     <>
       <GridCard sx={{ my: 3, width: "99%" }}>
         <Box paddingBottom={2}>
-          <Typography variant="h5" display="inline-block">
+          <Typography variant="h6" display="inline-block">
             {title}
           </Typography>
           <Divider />
         </Box>
         <Grid container spacing={3}>
-          {Object.entries(data).map(([name, value]) => (
-            <Grid
-              zeroMinWidth
-              key={`${name}_${value}`}
-              item
-              xs={12}
-              sm={12}
-              md={6}
-              lg={4}
-              xl={2.5}
+          {GridStat("WPM", data.wpm)}
+          {GridStat("Accuracy", data.accuracy)}
+          {data.mostMissedCharacter ? (
+            <Tooltip
+              title={
+                <Typography variant="body1">Most Missed Character</Typography>
+              }
+              placement="top-end"
+              sx={{ cursor: "pointer" }}
             >
-              <StatCard title={formatName(name)} stat={value} />
-            </Grid>
-          ))}
+              {GridStat("MMS", data.mostMissedCharacter)}
+            </Tooltip>
+          ) : null}
         </Grid>
       </GridCard>
     </>
